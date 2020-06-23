@@ -679,7 +679,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     } else if (msg == "//로오히 던전 퇴장") {
         if (loh[room][0] == "") {
-            replier.reply(prefix + "아직 아무도 입장하지 않았어요.\n" + sender + " 님께서 입장하셔도 좋아요");
+            replier.reply(prefix + "아직 아무도 입장하지 않았어요.\n" + sender + " 님께서 입장하셔도 좋아요.");
         } else if (loh[room][0] == sender) {
             replier.reply(prefix + sender + " 님께서 던전에서 퇴장하셨습니다.");
             loh[room] = ["", Date.now()];
