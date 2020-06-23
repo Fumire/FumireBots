@@ -661,13 +661,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     if (msg == "//로오히") {
-        replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!");
+        replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 경험치 → 겸험치 획득량을 미리 확인하세요!");
         return;
     } else if (msg == "//로오히 던전") {
         if (loh[room][0] == "") {
             replier.reply(prefix + "지금 던전(재앙의 경계)에 아무도 입장하지 않았습니다.\n'//로오히 던전 입장' 명령어로 입장해 보세요");
         } else {
-            replier.reply(prefix + "지금 " + loh[room] + " 님께서 도전 중이십니다.");
+            replier.reply(prefix + "지금 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
     } else if (msg == "//로오히 던전 입장") {
