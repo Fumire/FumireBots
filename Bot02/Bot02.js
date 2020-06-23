@@ -659,6 +659,10 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         loh_data["Normal"] = JSON.parse(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/LOH/Normal.json"));
     }
 
+    if (loh_data["Hard"] == undefined) {
+        loh_data["Hard"] = JSON.parse(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/LOH/Hard.json"));
+    }
+
     if (msg == "//로오히") {
         replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 경험치 → 겸험치 획득량을 미리 확인하세요!");
         return;
@@ -692,13 +696,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         loh[room] = ["", Date.now()];
         return;
     } else if (msg == "//로오히 경험치") {
-        replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2");
+        replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2\n→ //로오히 경험치 하드 3-4");
         return;
     } else if (msg.startsWith("//로오히 경험치")) {
         var data = null;
         var token = msg.split(" ");
         if (token.length != 4) {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2");
+            replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2\n→ //로오히 경험치 하드 3-4");
         }
 
         if (token[2] == "노말") {
@@ -708,11 +712,15 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 }
             }
         } else if (token[2] == "하드") {
-            replier.reply("아직 준비 중이에요.");
+            for (var key in loh_data["Hard"]) {
+                if (loh_data["Hard"][key]["스테이지"].startsWith(token[3])) {
+                    data = loh_data["Hard"][key];
+                }
+            }
         } else if (token[2] == "엘리트") {
             replier.reply("아직 준비 중이에요.");
         } else {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2");
+            replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2\n→ //로오히 경험치 하드 3-4");
         }
 
         if (data == null) {
