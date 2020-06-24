@@ -676,10 +676,9 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     } else if (msg == "//로오히 던전 입장") {
         if (loh[room][0] == "") {
             replier.reply(prefix + sender + " 님께서 던전에 입장하셨습니다.\n나오실 때 '//로오히 던전 퇴장' 잊지 마세요!");
-            loh[room] = [sender, Date.now()];
-            if (getProbability(probability[room])) return;
             var cats = ["시로", "미로"];
             replier.reply(randomPicker(cats) + "를 위하여!!!!!!!!!!");
+            loh[room] = [sender, Date.now()];
         } else {
             replier.reply(prefix + loh[room][0] + " 님께서 던전에 있어요! 잠시 기다려주세요!");
         }
