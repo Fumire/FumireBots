@@ -668,7 +668,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     } else if (msg == "//로오히 던전") {
         if (loh[room][0] == "") {
-            replier.reply(prefix + "지금 던전(재앙의 경계)에 아무도 입장하지 않았습니다.\n'//로오히 던전 입장' 명령어로 입장해 보세요");
+            replier.reply(prefix + "지금 던전(재앙의 경계)에 아무도 입장하지 않았습니다.\n'//로오히 던전 입장' 명령어로 입장해 보세요.");
         } else {
             replier.reply(prefix + "지금 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
@@ -677,6 +677,9 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         if (loh[room][0] == "") {
             replier.reply(prefix + sender + " 님께서 던전에 입장하셨습니다.\n나오실 때 '//로오히 던전 퇴장' 잊지 마세요!");
             loh[room] = [sender, Date.now()];
+            if (getProbability(probability[room])) return;
+            var cats = ["시로", "미로"];
+            replier.reply(randomPicker(cats) + "를 위하여!!!!!!!!!!");
         } else {
             replier.reply(prefix + loh[room][0] + " 님께서 던전에 있어요! 잠시 기다려주세요!");
         }
@@ -719,6 +722,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             }
         } else if (token[2] == "엘리트") {
             replier.reply("아직 준비 중이에요.");
+            return;
         } else {
             replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2\n→ //로오히 경험치 하드 3-4");
         }
@@ -728,6 +732,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         } else {
             replier.reply("<" + data["스테이지"] + ">\n→ 총 경험치: " + data["총 경험치"] + "\n→ 소비 행동력: " + data["소모 행동력"] + "\n→ 행동력 당 경험치: " + parseFloat(data["행동력 당 경험치"]).toFixed(3));
         }
+        return;
     }
 
     if (probability[room] == undefined) {
