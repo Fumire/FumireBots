@@ -664,7 +664,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     if (msg == "//로오히") {
-        replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 경험치 → 겸험치 획득량을 미리 확인하세요!");
+        replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 경험치 → 경험치 획득량을 미리 확인하세요!");
         return;
     } else if (msg == "//로오히 던전") {
         if (loh[room][0] == "") {
