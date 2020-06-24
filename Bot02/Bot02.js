@@ -25,6 +25,10 @@ const constructing = false;
 
 const blacklist = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
 
+var day = new Date();
+var final_clock = Date.now();
+const clocklist = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
+
 var MD5 = function(string) {
 
     function RotateLeft(lValue, iShiftBits) {
@@ -360,6 +364,18 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     }
 
+    if (day.getMinutes() == 0)
+    {
+        if( (final_clock - Date.now()) >= (60 * 1000))
+        {
+            final_clock = Date.now();
+            for(var i = 0; i < clocklist.length; i++)
+            {
+                replier.reply(clocklist[i], prefix + "지금은 " + String(day.getHours()) + "시 입니다.");
+            }
+        }
+    }
+
     if (msg == "//help" || msg == "//도움") {
         replier.reply("--- General ---\n//help //도움 → 간단한 도움말\n//introduce //소개 → 자기소개\n--- Product ---\n//주식 → 주식 관련 기능\n--- Fun ---\n//팩토 → 팩토리오 관련 기능\n//타자 → 타자 연습\n//초성 → 초성 퀴즈\n--- Verbosity ---\n⭐ 가끔 말도 한답니다!\n//speak → 더 자주 말합니다.\n//quiet → 덜 말합니다.\n--- 마법의 소라고둥---\n마법의 소라고둥님~~요?\n--- etc ---\n⭐ 몇몇 이스터에그가 숨어있어요!\n");
         return;
@@ -676,9 +692,16 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     } else if (msg == "//로오히 던전 입장") {
         if (loh[room][0] == "") {
             replier.reply(prefix + sender + " 님께서 던전에 입장하셨습니다.\n나오실 때 '//로오히 던전 퇴장' 잊지 마세요!");
-            var cats = ["시로", "미로"];
-            replier.reply(randomPicker(cats) + "를 위하여" + "!".repeat(getRandomInt(5, 10)));
             loh[room] = [sender, Date.now()];
+            if (getProbability(95)) {
+                var cats = ["시로", "미로"];
+                replier.reply(randomPicker(cats) + "를 위하여" + "!".repeat(getRandomInt(5, 10)));
+            } else {
+                Kakao.send(room, {
+                    "link_ver": "4.0",
+                    "template_id": 31084
+                }, "custom");
+            }
         } else {
             replier.reply(prefix + loh[room][0] + " 님께서 던전에 있어요! 잠시 기다려주세요!");
         }
@@ -693,7 +716,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(prefix + sender + "님이 아니라 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
-    } else if (loh[room][0] != "" && Date.now() - loh[room][1] > 600 * 1000) {
+    } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (600 * 1000)) {
         replier.reply(prefix + loh[room][0] + "님께서 10분이 지나 퇴장한 것으로 간주되었습니다.");
         loh[room] = ["", Date.now()];
         return;
