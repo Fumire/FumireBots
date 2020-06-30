@@ -25,8 +25,6 @@ const constructing = false;
 
 const blacklist = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
 
-var day = new Date();
-var final_clock = Date.now();
 const clocklist = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
 
 var MD5 = function(string) {
@@ -364,18 +362,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     }
 
-    if (day.getMinutes() == 0)
-    {
-        if( (final_clock - Date.now()) >= (60 * 1000))
-        {
-            final_clock = Date.now();
-            for(var i = 0; i < clocklist.length; i++)
-            {
-                replier.reply(clocklist[i], prefix + "지금은 " + String(day.getHours()) + "시 입니다.");
-            }
-        }
-    }
-
     if (msg == "//help" || msg == "//도움") {
         replier.reply("--- General ---\n//help //도움 → 간단한 도움말\n//introduce //소개 → 자기소개\n--- Product ---\n//주식 → 주식 관련 기능\n--- Fun ---\n//팩토 → 팩토리오 관련 기능\n//타자 → 타자 연습\n//초성 → 초성 퀴즈\n--- Verbosity ---\n⭐ 가끔 말도 한답니다!\n//speak → 더 자주 말합니다.\n//quiet → 덜 말합니다.\n--- 마법의 소라고둥---\n마법의 소라고둥님~~요?\n--- etc ---\n⭐ 몇몇 이스터에그가 숨어있어요!\n");
         return;
@@ -679,8 +665,12 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         loh_data["Hard"] = JSON.parse(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/LOH/Hard.json"));
     }
 
+    if (loh_data["Normal-gold"] == undefined) {
+        loh_data["Normal-gold"] = JSON.parse(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/LOH/Normal-gold.json"))
+    }
+
     if (msg == "//로오히") {
-        replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 경험치 → 경험치 획득량을 미리 확인하세요!");
+        replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 맵 → 경험치 및 골드 획득량을 미리 확인하세요!");
         return;
     } else if (msg == "//로오히 던전") {
         if (loh[room][0] == "") {
@@ -720,39 +710,55 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         replier.reply(prefix + loh[room][0] + "님께서 10분이 지나 퇴장한 것으로 간주되었습니다.");
         loh[room] = ["", Date.now()];
         return;
-    } else if (msg == "//로오히 경험치") {
-        replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2\n→ //로오히 경험치 하드 3-4");
+    } else if (msg == "//로오히 맵") {
+        replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2");
         return;
-    } else if (msg.startsWith("//로오히 경험치")) {
-        var data = null;
+    } else if (msg.startsWith("//로오히 맵")) {
+        var exp_data = null;
+        var gold_data = null;
         var token = msg.split(" ");
+
         if (token.length != 4) {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2\n→ //로오히 경험치 하드 3-4");
+            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2");
         }
 
         if (token[2] == "노말") {
             for (var key in loh_data["Normal"]) {
                 if (loh_data["Normal"][key]["스테이지"].startsWith(token[3])) {
-                    data = loh_data["Normal"][key];
+                    exp_data = loh_data["Normal"][key];
+                }
+            }
+            for (var key in loh_data["Normal-gold"]) {
+                if (loh_data["Normal-gold"][key]["스테이지"].startsWith(token[3])) {
+                    gold_data = loh_data["Normal-gold"][key];
                 }
             }
         } else if (token[2] == "하드") {
-            for (var key in loh_data["Hard"]) {
-                if (loh_data["Hard"][key]["스테이지"].startsWith(token[3])) {
-                    data = loh_data["Hard"][key];
-                }
-            }
+            replier.reply("아직 준비 중이에요.");
+            return;
         } else if (token[2] == "엘리트") {
             replier.reply("아직 준비 중이에요.");
             return;
         } else {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 경험치 노말 1-2\n→ //로오히 경험치 하드 3-4");
+            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2");
+            return;
         }
 
-        if (data == null) {
+        if (exp_data == null || gold_data == null) {
             replier.reply("잘 못 된 스테이지 입니다.");
         } else {
-            replier.reply("<" + data["스테이지"] + ">\n→ 총 경험치: " + data["총 경험치"] + "\n→ 소비 행동력: " + data["소모 행동력"] + "\n→ 행동력 당 경험치: " + parseFloat(data["행동력 당 경험치"]).toFixed(3));
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 31584,
+                "template_args": {
+                    "0": exp_data["적 전투력"],
+                    "1": exp_data["총 경험치"],
+                    "2": gold_data["평균"].toFixed(2),
+                    "3": exp_data["행동력 당 경험치"].toFixed(2),
+                    "4": gold_data["행동력 당 골드"].toFixed(2)
+                }
+            }, "custom");
+            replier.reply("골드 획득량은 달라질 수도 있습니다.");
         }
         return;
     }
@@ -817,7 +823,32 @@ function onCreate(savedInstanceState, activity) {
     Log.debug("Bot02 has been created!");
 }
 
-function onStart(activity) {}
+function clock() {
+    var day = new Date();
+    for (var i = 0; i < clocklist.length; i++) {
+        replier.reply(clocklist[i], prefix + "지금은 " + String(day.getHours()) + "시 입니다.");
+    }
+    Log.debug(String(day.getHours()) + "시 알림");
+}
+
+function everyHour() {
+    setInterval(clock, 60 * 60 * 1000);
+}
+
+function onStart(activity) {
+    Log.debug("Initiated");
+    var nextDate = new Date();
+    if (nextDate.getMinutes() == 0) {
+        everyHour();
+    } else {
+        nextDate.setHours(nextDate.getHours() + 1);
+        nextDate.setMinutes(0);
+        nextDate.setSeconds(0);
+
+        var difference = nextDate - new Date();
+        setTimeout(everyHour, difference);
+    }
+}
 
 function onResume(activity) {}
 
