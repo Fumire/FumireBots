@@ -711,7 +711,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(prefix + sender + " 님께서 던전에서 퇴장하셨습니다.");
             loh[room] = ["", Date.now()];
         } else if (loh[room][0] != sender) {
-            replier.reply(prefix + sender + "님이 아니라 " + loh[room][0] + " 님께서 도전 중이십니다.");
+            replier.reply(prefix + sender + " 님이 아니라 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
     } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (600 * 1000)) {
