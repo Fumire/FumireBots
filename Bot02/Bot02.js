@@ -262,8 +262,6 @@ function getRandomInt(min, max) {
 }
 
 function getProbability(probability) {
-    if (probability == 100) return true;
-    else if (probability == 0) return false;
     return getRandomInt(0, 100) <= probability;
 }
 
@@ -337,7 +335,7 @@ function getFinalSound(src) {
 }
 
 function getHash() {
-    return MD5("Fumire" + String(parseInt(Date.now() / 10000)));
+    return MD5(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/password3.txt").trim() + String(parseInt(Date.now() / 10000)));
 }
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
@@ -381,7 +379,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         replier.reply("//주식 추천 → 예상 최고 수익률 종목을 알려드립니다!\n//주식 예상 (종목) → 해당 종목의 예상 수익을 알려드립니다.");
         return;
     } else if (msg == "//주식 추천") {
-        var data = Utils.getTextFromWeb("https://fumire.moe/bots/query1.php?hash=" + getHash()).split("/");
+        var data = "";
+        do {
+            data = Utils.getTextFromWeb("https://fumire.moe/bots/query1.php?hash=" + getHash());
+        }
+        while (data.startsWith("<meta"));
+
+        data = data.split("/");
         var json_data = {};
 
         for (var i = 0; i < data.length; i++) {
@@ -405,7 +409,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         }
         token[2] = encodeURIComponent(token[2])
 
-        var data = Utils.getTextFromWeb("https://fumire.moe/bots/query2.php?code=" + token[2] + "&hash=" + getHash());
+        var data = "";
+        do {
+            data = Utils.getTextFromWeb("https://fumire.moe/bots/query2.php?code=" + token[2] + "&hash=" + getHash());
+        } while (data.startsWith("<meta"));
+
         if (data == "Something went wrong!") {
             replier.reply("없는 주식 종목입니다. 다시 확인해주시겠어요?");
             return;
@@ -823,32 +831,7 @@ function onCreate(savedInstanceState, activity) {
     Log.debug("Bot02 has been created!");
 }
 
-function clock() {
-    var day = new Date();
-    for (var i = 0; i < clocklist.length; i++) {
-        replier.reply(clocklist[i], prefix + "지금은 " + String(day.getHours()) + "시 입니다.");
-    }
-    Log.debug(String(day.getHours()) + "시 알림");
-}
-
-function everyHour() {
-    setInterval(clock, 60 * 60 * 1000);
-}
-
-function onStart(activity) {
-    Log.debug("Initiated");
-    var nextDate = new Date();
-    if (nextDate.getMinutes() == 0) {
-        everyHour();
-    } else {
-        nextDate.setHours(nextDate.getHours() + 1);
-        nextDate.setMinutes(0);
-        nextDate.setSeconds(0);
-
-        var difference = nextDate - new Date();
-        setTimeout(everyHour, difference);
-    }
-}
+function onStart(activity) {}
 
 function onResume(activity) {}
 
