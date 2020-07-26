@@ -23,9 +23,7 @@ Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bots/Bot
 const SD_directory = "/storage/029A-0F01/Bots/";
 
 const deny_list = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
-
 const clock_list = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
-var last_hours = 25;
 
 var MD5 = function(string) {
 
@@ -346,8 +344,8 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     var minutes = new Date().getMinutes();
     if (minutes == "00") {
         const hours = new Date().getHours();
-        if (last_hours != hours) {
-            last_hours = hours;
+        if (AppData.getInt("clock") != hours) {
+            AppData.putInt("clock", parseInt(hours));
             for (var i = 0; i < clock_list.length; i++) {
                 replier.reply(clock_list[i], prefix + "지금은 " + hours + "시 정각입니다!");
             }
@@ -379,21 +377,26 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     }
 
+    if ((Date.now() - AppData.getInt("stock")) > (60 * 60 * 1000)) {
+        AppData.putInt("stock", Date.now());
+
+        AppData.putString("stock01", Utils.getTextFromWeb("https://fumire.moe/bots/stock_estimation.php?hash=" + getHash()));
+        AppData.putString("stock02", Utils.getTextFromWeb("https://fumire.moe/bots/query1.php?hash=" + getHash()));
+    }
+
     if (msg == "//주식") {
         replier.reply("//주식 추천 → 예상 최고 수익률 종목을 알려드립니다!\n//주식 예상 (종목) → 해당 종목의 예상 수익을 알려드립니다.");
         return;
     } else if (msg == "//주식 추천") {
-        var data = "";
-        do {
-            data = Utils.getTextFromWeb("https://fumire.moe/bots/query1.php?hash=" + getHash());
-        }
-        while (data.startsWith("<meta"));
+        var data = JSON.parse(AppData.getString("stock02"));
 
-        data = data.split("/");
         var json_data = {};
+        var i = 0;
 
-        for (var i = 0; i < data.length; i++) {
-            json_data["d" + String(i)] = data[i];
+        for(var key in data)
+        {
+            json_data["d" + String(i++)] = data[key]["Name"] + "(" + data[key]["Code"] + ")";
+            json_data["d" + String(i++)] = data[key]["GainRate"] + "%";
         }
 
         Kakao.send(room, {
@@ -411,19 +414,28 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         for (var i = 3; i < token.length; i++) {
             token[2] += " " + token[i];
         }
-        token[2] = encodeURIComponent(token[2])
 
-        var data = "";
-        do {
-            data = Utils.getTextFromWeb("https://fumire.moe/bots/query2.php?code=" + token[2] + "&hash=" + getHash());
-        } while (data.startsWith("<meta"));
+        const estimation = JSON.parse(AppData.getString("stock01"));
+        var data = null;
 
-        if (data == "Something went wrong!") {
-            replier.reply("없는 주식 종목입니다. 다시 확인해주시겠어요?");
-            return;
+        for(var key in estimation)
+        {
+            if(estimation[key]["Name"] == token[2])
+            {
+                data = estimation[key];
+                break;
+            }
+            else if(estimation[key]["Code"] == token[2])
+            {
+                data = estimation[key];
+                break;
+            }
         }
 
-        data = data.split("\n");
+        if(data == null)
+        {
+            replier.reply("없는 주식 종목입니다. 종목명을 확인해주세요");
+        }
 
         Kakao.send(room, {
             "link_ver": "4.0",
@@ -431,13 +443,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 "object_type": "feed",
                 "button_title": "수익률 예측",
                 "content": {
-                    "title": data[0],
+                    "title": data["Name"] + "(" + data["Code"] + ")",
                     "image_url": "",
                     "link": {
-                        "web_url": data[2],
-                        "mobile_web_url": data[2]
+                        "web_url": "https://fumire.moe/stock/list_all.php",
+                        "mobile_web_url": "https://fumire.moe/stock/list_all.php"
                     },
-                    "description": "예상 수익률: " + data[1] + " %"
+                    "description": "예상 수익률: " + data["GainRate"] + " %"
                 },
                 "buttons": [{
                     "title": "더 다양한 예측은?",
@@ -669,26 +681,21 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         loh[room] = ["", Date.now()]
     }
 
-
     if (msg == "//로오히") {
         replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 맵 → 경험치 및 골드 획득량을 미리 확인하세요!");
         return;
     } else if (msg == "//로오히 던전") {
         if (loh[room][0] == "") {
             replier.reply(prefix + "지금 던전(재앙의 경계)에 아무도 입장하지 않았습니다.\n'//로오히 던전 입장' 명령어로 입장해 보세요.");
-        }
-        else if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000))
-        {
+        } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000)) {
             replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
             loh[room] = ["", Date.now()];
-        }
-        else {
+        } else {
             replier.reply(prefix + "지금 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
     } else if (msg == "//로오히 던전 입장") {
-        if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000))
-        {
+        if (loh[room][0] != "" && (Date.now() - loh[room][1]) > (15 * 60 * 1000)) {
             replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
             loh[room] = ["", Date.now()];
         }
@@ -741,12 +748,14 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             for (var key in data) {
                 if (data[key]["스테이지"].startsWith(token[3])) {
                     exp_data = data[key];
+                    break;
                 }
             }
             var data = JSON.parse(FileStream.read(SD_directory + token[2] + "-gold.json"));
             for (var key in data) {
                 if (data[key]["스테이지"].startsWith(token[3])) {
                     gold_data = data[key];
+                    break;
                 }
             }
         } else if (token[2] == "엘리트") {
@@ -821,6 +830,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 
 //아래 4개의 메소드는 액티비티 화면을 수정할때 사용됩니다.
 function onCreate(savedInstanceState, activity) {
+    AppData.clear();
+
+    AppData.putInt("stock", 0);
+    AppData.putInt("clock", 25);
+
     Log.debug("Bot02 has been created!");
 }
 
