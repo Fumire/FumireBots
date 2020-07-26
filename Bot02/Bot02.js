@@ -22,9 +22,9 @@ Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bots/Bot
 
 const SD_directory = "/storage/029A-0F01/Bots/";
 
-const denylist = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
+const deny_list = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
 
-const clocklist = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
+const clock_list = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
 
 var MD5 = function(string) {
 
@@ -338,8 +338,18 @@ function getHash() {
 }
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    if (isGroupChat == true && denylist.includes(room) == true) {
+    if (isGroupChat == true && deny_list.includes(room) == true) {
         return;
+    }
+
+    var minutes = new Date().getMinutes();
+    if(minutes == "00" || true)
+    {
+        const hours = new Date().getHours();
+        for(var i = 0; i < clock_list.length; i++)
+        {
+            replier.reply(clock_list[i], "지금은 " + hours + " 시입니다!");
+        }
     }
 
     msg = msg.trim();
