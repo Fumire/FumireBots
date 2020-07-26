@@ -21,7 +21,7 @@ const Kakao = new kalingModule;
 Kakao.init(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/password1.txt").trim());
 Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/password2.txt").trim());
 
-const constructing = false;
+const SD_directory = "0 bytes in 0 files in /storage/029A-0F01/Bots/";
 
 const blacklist = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
 
@@ -352,13 +352,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     const reg_msg = msg.replace(/[^ㄱ-ㅣ|가-힣|a-z|A-Z|0-9|\s]+/gi, "").replace(/\s+/gi, " ").split(" ");
 
     if (msg.startsWith("!")) {}
-
-    if (msg.startsWith("//") && constructing) {
-        replier.reply(prefix + "지금은 점검 중입니다.");
-        return;
-    } else if (constructing) {
-        return;
-    }
 
     if (msg == "//help" || msg == "//도움") {
         replier.reply("--- General ---\n//help //도움 → 간단한 도움말\n//introduce //소개 → 자기소개\n--- Product ---\n//주식 → 주식 관련 기능\n--- Fun ---\n//팩토 → 팩토리오 관련 기능\n//타자 → 타자 연습\n//초성 → 초성 퀴즈\n--- Verbosity ---\n⭐ 가끔 말도 한답니다!\n//speak → 더 자주 말합니다.\n//quiet → 덜 말합니다.\n--- 마법의 소라고둥---\n마법의 소라고둥님~~요?\n--- etc ---\n⭐ 몇몇 이스터에그가 숨어있어요!\n");
@@ -823,11 +816,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 
 //아래 4개의 메소드는 액티비티 화면을 수정할때 사용됩니다.
 function onCreate(savedInstanceState, activity) {
-    var textView = new android.widget.TextView(activity);
-    textView.setText("Hello, World!");
-    textView.setTextColor(android.graphics.Color.DKGRAY);
-    activity.setContentView(textView);
-
     Log.debug("Bot02 has been created!");
 }
 
