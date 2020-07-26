@@ -25,6 +25,7 @@ const SD_directory = "/storage/029A-0F01/Bots/";
 const deny_list = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
 
 const clock_list = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
+var last_hours = 25;
 
 var MD5 = function(string) {
 
@@ -343,12 +344,16 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     var minutes = new Date().getMinutes();
-    if(minutes == "00" || true)
+    if(minutes == "00")
     {
         const hours = new Date().getHours();
-        for(var i = 0; i < clock_list.length; i++)
+        if(last_hours != hours)
         {
-            replier.reply(clock_list[i], "지금은 " + hours + " 시입니다!");
+            last_hours = hours;
+            for(var i = 0; i < clock_list.length; i++)
+            {
+                replier.reply(clock_list[i], "지금은 " + hours + " 시 정각입니다!");
+            }
         }
     }
 
