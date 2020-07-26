@@ -813,13 +813,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     }
 
-    var faces = ["ㅇㄱㅇ", "ㅇㄴㅇ", "ㅇㄷㅇ", "ㅇㄹㅇ", "ㅇㅁㅇ", "ㅇㅂㅇ", "ㅇㅅㅇ", "ㅇㅇㅇ", "ㅇㅈㅇ", "ㅇㅊㅇ", "ㅇㅋㅇ", "ㅇㅌㅇ", "ㅇㅍㅇ", "ㅇㅎㅇ"];
-    if (faces.indexOf(msg) != -1) {
-        if (getProbability(probability[room])) return;
-        replier.reply(prefix + randomPicker(faces));
-        return;
-    }
-
     if (/마법의(|\s)소라고(동|둥)님(\S|\s)+(요|죠)\?/.test(msg) == true) {
         replier.reply(prefix + randomPicker(["응", "아니", "언젠가는", "가만히 있어", "다 안 돼", "좋아", "다시 한 번 물어봐", "안 돼"]));
         return;
