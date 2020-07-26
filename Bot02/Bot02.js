@@ -349,7 +349,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         if (last_hours != hours) {
             last_hours = hours;
             for (var i = 0; i < clock_list.length; i++) {
-                replier.reply(clock_list[i], "지금은 " + hours + " 시 정각입니다!");
+                replier.reply(clock_list[i], prefix + "지금은 " + hours + "시 정각입니다!");
             }
         }
     }
