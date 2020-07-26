@@ -344,14 +344,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     var minutes = new Date().getMinutes();
-    if(minutes == "00")
-    {
+    if (minutes == "00") {
         const hours = new Date().getHours();
-        if(last_hours != hours)
-        {
+        if (last_hours != hours) {
             last_hours = hours;
-            for(var i = 0; i < clock_list.length; i++)
-            {
+            for (var i = 0; i < clock_list.length; i++) {
                 replier.reply(clock_list[i], "지금은 " + hours + " 시 정각입니다!");
             }
         }
@@ -368,11 +365,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     if (msg.startsWith("!")) {}
 
     if (msg == "//help" || msg == "//도움") {
-        replier.reply("--- General ---\n//help //도움 → 간단한 도움말\n//introduce //소개 → 자기소개\n--- Product ---\n//주식 → 주식 관련 기능\n--- Fun ---\n//팩토 → 팩토리오 관련 기능\n//타자 → 타자 연습\n//초성 → 초성 퀴즈\n--- Verbosity ---\n⭐ 가끔 말도 한답니다!\n//speak → 더 자주 말합니다.\n//quiet → 덜 말합니다.\n--- 마법의 소라고둥---\n마법의 소라고둥님~~요?\n--- etc ---\n⭐ 몇몇 이스터에그가 숨어있어요!\n");
+        replier.reply("--- General ---\n//help //도움 → 간단한 도움말\n//introduce //소개 → 자기소개\n--- Product ---\n//주식 → 주식 관련 기능\n--- Fun ---\n//팩토 → 팩토리오 관련 기능\n//로오히 → 로드 오브 히어로 관련 기능\n//타자 → 타자 연습\n//초성 → 초성 퀴즈\n--- Verbosity ---\n⭐ 가끔 말도 한답니다!\n//speak → 더 자주 말합니다.\n//quiet → 덜 말합니다.\n--- 마법의 소라고둥---\n마법의 소라고둥님~~요?\n--- etc ---\n⭐ 몇몇 이스터에그가 숨어있어요!\n");
         return;
     }
 
-    if (msg == "//introduce" || msg == "//소개") {
+    if (msg == "//소개") {
         replier.reply(prefix + "안녕하세요, 저는 카카오톡 봇이에요.\n//도움 명령어로 더 알아보세요.\n연락: https://open.kakao.com/me/Fumire");
         return;
     }
