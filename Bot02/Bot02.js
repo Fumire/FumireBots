@@ -14,16 +14,15 @@ const probability = {};
 const typing = {};
 const wordquiz = {};
 const loh = {};
-const loh_data = {};
 
 const kalingModule = require("kalink").Kakao();
 const Kakao = new kalingModule;
 Kakao.init(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/password1.txt").trim());
 Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/password2.txt").trim());
 
-const SD_directory = "0 bytes in 0 files in /storage/029A-0F01/Bots/";
+const SD_directory = "/storage/029A-0F01/Bots/";
 
-const blacklist = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
+const denylist = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
 
 const clocklist = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
 
@@ -339,7 +338,7 @@ function getHash() {
 }
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    if (isGroupChat == true && blacklist.includes(room) == true) {
+    if (isGroupChat == true && denylist.includes(room) == true) {
         return;
     }
 
@@ -655,20 +654,9 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     if (loh[room] == undefined) {
-        loh[room] = ["", Date.now()];
+        loh[room] = ["", Date.now()]
     }
 
-    if (loh_data["Normal"] == undefined) {
-        loh_data["Normal"] = JSON.parse(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/LOH/Normal.json"));
-    }
-
-    if (loh_data["Hard"] == undefined) {
-        loh_data["Hard"] = JSON.parse(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/LOH/Hard.json"));
-    }
-
-    if (loh_data["Normal-gold"] == undefined) {
-        loh_data["Normal-gold"] = JSON.parse(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/LOH/Normal-gold.json"))
-    }
 
     if (msg == "//로오히") {
         replier.reply("//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 맵 → 경험치 및 골드 획득량을 미리 확인하세요!");
@@ -712,7 +700,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         loh[room] = ["", Date.now()];
         return;
     } else if (msg == "//로오히 맵") {
-        replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2");
+        replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n이렇게 명령해주세요\n→ //로오히 맵 하드 3-4");
         return;
     } else if (msg.startsWith("//로오히 맵")) {
         var exp_data = null;
@@ -720,23 +708,23 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         var token = msg.split(" ");
 
         if (token.length != 4) {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2");
+            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n이렇게 명령해주세요\n→ //로오히 맵 하드 3-4");
+            return;
         }
 
-        if (token[2] == "노말") {
-            for (var key in loh_data["Normal"]) {
-                if (loh_data["Normal"][key]["스테이지"].startsWith(token[3])) {
-                    exp_data = loh_data["Normal"][key];
+        if (token[2] == "노말" || token[2] == "하드") {
+            var data = JSON.parse(FileStream.read(SD_directory + token[2] + "-exp.json"));
+            for (var key in data) {
+                if (data[key]["스테이지"].startsWith(token[3])) {
+                    exp_data = data[key];
                 }
             }
-            for (var key in loh_data["Normal-gold"]) {
-                if (loh_data["Normal-gold"][key]["스테이지"].startsWith(token[3])) {
-                    gold_data = loh_data["Normal-gold"][key];
+            var data = JSON.parse(FileStream.read(SD_directory + token[2] + "-gold.json"));
+            for (var key in data) {
+                if (data[key]["스테이지"].startsWith(token[3])) {
+                    gold_data = data[key];
                 }
             }
-        } else if (token[2] == "하드") {
-            replier.reply("아직 준비 중이에요.");
-            return;
         } else if (token[2] == "엘리트") {
             replier.reply("아직 준비 중이에요.");
             return;
