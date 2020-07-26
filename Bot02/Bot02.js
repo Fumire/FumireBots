@@ -676,11 +676,23 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     } else if (msg == "//로오히 던전") {
         if (loh[room][0] == "") {
             replier.reply(prefix + "지금 던전(재앙의 경계)에 아무도 입장하지 않았습니다.\n'//로오히 던전 입장' 명령어로 입장해 보세요.");
-        } else {
+        }
+        else if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000))
+        {
+            replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
+            loh[room] = ["", Date.now()];
+        }
+        else {
             replier.reply(prefix + "지금 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
     } else if (msg == "//로오히 던전 입장") {
+        if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000))
+        {
+            replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
+            loh[room] = ["", Date.now()];
+        }
+
         if (loh[room][0] == "") {
             replier.reply(prefix + sender + " 님께서 던전에 입장하셨습니다.\n나오실 때 '//로오히 던전 퇴장' 잊지 마세요!");
             loh[room] = [sender, Date.now()];
@@ -707,12 +719,12 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(prefix + sender + " 님이 아니라 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
-    } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (600 * 1000)) {
-        replier.reply(prefix + loh[room][0] + "님께서 10분이 지나 퇴장한 것으로 간주되었습니다.");
+    } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000)) {
+        replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
         loh[room] = ["", Date.now()];
         return;
     } else if (msg == "//로오히 맵") {
-        replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n이렇게 명령해주세요\n→ //로오히 맵 하드 3-4");
+        replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n→ //로오히 맵 하드 3-4");
         return;
     } else if (msg.startsWith("//로오히 맵")) {
         var exp_data = null;
@@ -720,7 +732,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         var token = msg.split(" ");
 
         if (token.length != 4) {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n이렇게 명령해주세요\n→ //로오히 맵 하드 3-4");
+            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n→ //로오히 맵 하드 3-4");
             return;
         }
 
@@ -741,7 +753,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply("아직 준비 중이에요.");
             return;
         } else {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2");
+            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n→ //로오히 맵 하드 3-4");
             return;
         }
 
