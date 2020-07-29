@@ -377,7 +377,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     }
 
-    if ((Date.now() - AppData.getInt("stock")) > (60 * 60 * 1000)) {
+    if ((Date.now() - AppData.getInt("stock")) > (60 * 60 * 1000) || AppData.getString("stock01") == "" || AppData.getString("stock02") == "") {
         AppData.putInt("stock", Date.now());
 
         AppData.putString("stock01", Utils.getTextFromWeb("https://fumire.moe/bots/stock_estimation.php?hash=" + getHash()));
