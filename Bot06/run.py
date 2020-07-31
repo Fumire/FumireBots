@@ -17,7 +17,7 @@ def make_chosung(text):
 
 regex = re.compile(r"[^가-힣\ ]+")
 
-with open("./password.txt", "r") as f:
+with open("password.txt", "r") as f:
     connection = pymysql.connect(host="fumire.moe", user="fumiremo_admin", password=f.readline().strip(), db="fumiremo_Bots", charset="utf8", port=3306)
 cursor = connection.cursor(pymysql.cursors.DictCursor)
 

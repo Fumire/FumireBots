@@ -11,10 +11,10 @@ delete:
 	docker rmi $(IMAGE_NAME)
 
 start:
-	docker run --name $(CONTAINER_NAME) --rm --detach --volume $(abspath .):/usr/src/app --publish 1234:3306 $(IMAGE_NAME)
+	docker run --name $(CONTAINER_NAME) --rm --detach --volume $(abspath .):/usr/src/app --publish-all $(IMAGE_NAME)
 
 test:
-	docker run --name $(CONTAINER_NAME) --rm -it --volume $(abspath .):/usr/src/app --publish 1234:3306 $(IMAGE_NAME)
+	docker run --name $(CONTAINER_NAME) --rm -it --volume $(abspath .):/usr/src/app --publish-all $(IMAGE_NAME)
 
 
 stop:

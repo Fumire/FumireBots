@@ -1,7 +1,14 @@
-FROM python:3
+FROM python:3.8.5
 
-WORKDIR /usr/src/app
+ADD requirements.txt /
+ADD *.json /
+ADD run.py /
+ADD password*.txt /
 
-RUN pip install --no-cache-dir pymysql bs4 requests
+VOLUME /result
 
-ENTRYPOINT ["python3", "run.py"]
+RUN pip3 install --no-cache-dir --requirement /requirements.txt
+
+EXPOSE 3306
+
+ENTRYPOINT ["python3", "/run.py"]
