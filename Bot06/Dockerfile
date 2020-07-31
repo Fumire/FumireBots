@@ -1,7 +1,6 @@
 FROM python:3.8.5
 
 ADD requirements.txt /
-ADD *.json /
 ADD run.py /
 ADD password*.txt /
 
