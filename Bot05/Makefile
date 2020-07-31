@@ -7,8 +7,9 @@ all: result.json
 build.log: Dockerfile
 	docker build --rm --tag $(IMAGE_NAME) . | tee $@
 
-result.json: run.py build.log
-	docker run --name $(CONTAINER_NAME) --rm --tty --volume $(abspath .):/result $(IMAGE_NAME)
+start: run.py build.log
+	docker run --name $(CONTAINER_NAME) --publish-all --rm --tty --volume $(abspath .):/result $(IMAGE_NAME)
+.PHONY += all
 
 delete: build.log 
 	docker rmi $(IMAGE_NAME)

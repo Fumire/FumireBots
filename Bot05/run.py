@@ -2,6 +2,7 @@ import json
 import re
 import bs4
 import requests
+import pymysql
 
 regex = re.compile(r"[^가-힣]+")
 regex2 = re.compile(r"[^ㄱ-ㅎ가-힣]+")
@@ -9,7 +10,9 @@ regex3 = re.compile(r"[^ㅏ-ㅣ가-힣]+")
 
 session = requests.Session()
 
-file_name = "/result/result.json"
+with open("./password.txt", "r") as f:
+    connection = pymysql.connect(host="fumire.moe", user="fumiremo_admin", password=f.readline().strip(), db="fumiremo_Bots", charset="utf8", port=3306)
+cursor = connection.cursor(pymysql.cursors.DictCursor)
 
 
 def make_chosung(text):
@@ -25,9 +28,6 @@ def make_chosung(text):
             answer += chosung[(ord(character) - ord('가')) // 588]
     return answer
 
-
-with open(file_name, "w") as f:
-    f.write("{\n")
 
 html_data = bs4.BeautifulSoup(session.post("https://ko.wiktionary.org/wiki/부록:자주_쓰이는_한국어_낱말_5800").text, "html.parser")
 white_list = [dd.find("a").text for dd in html_data.find_all("dd")][1:]
@@ -49,14 +49,11 @@ for filename in ["korean_dictionary1.json", "korean_dictionary2.json"]:
                 continue
 
             data["raw"] = bs4.BeautifulSoup(data["raw"], "html.parser").text
-            data["raw"] = data["raw"].replace(data["word"], "~")
+            data["raw"] = data["raw"][:data["raw"].find("❖예문")].replace(data["word"], "~").replace("'", "\\'").strip()
 
-            with open(file_name, "a") as f:
-                f.write("\"" + data["word"] + "\":")
-                f.write(json.dumps({"Meaning": data["raw"], "which": which, "Chosung": make_chosung(data["word"])}))
-                f.write(",\n")
+            query = "INSERT INTO `WordQuiz` (`IndexColumn`, `Which`, `Word`, `Chosung`, `Meaning`) VALUES (NULL, '%s', '%s', '%s', '%s');" % (which, data["word"], make_chosung(data["word"]), data["raw"])
+            cursor.execute(query)
 
             print(data["word"])
 
-with open(file_name, "a") as f:
-    f.write("}")
+connection.close()
