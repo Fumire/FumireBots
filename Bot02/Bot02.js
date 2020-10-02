@@ -337,10 +337,6 @@ function getHash() {
 }
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    if (isGroupChat == true && deny_list.includes(room) == true) {
-        return;
-    }
-
     var minutes = new Date().getMinutes();
     if (minutes == "00") {
         const hours = new Date().getHours();
@@ -355,6 +351,10 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     msg = msg.trim();
     sender = sender.trim();
     room = room.trim();
+
+    if (isGroupChat == true && deny_list.includes(room) == true) {
+        return;
+    }
 
     const reg_room = room.replace(/[^ㄱ-ㅣ|가-힣|a-z|A-Z|0-9]+/gi, "");
     const reg_sender = sender.replace(/[^ㄱ-ㅣ|가-힣|a-z|A-Z|0-9]+/gi, "");
