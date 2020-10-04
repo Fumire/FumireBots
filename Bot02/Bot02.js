@@ -377,8 +377,21 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     }
 
-    if (msg.startsWith("//주식")) {
-        replier.reply(prefix + "알고리즘 개편 중입니다. 더 좋은 모습으로 돌아오겠습니다.");
+    if (msg.startsWith("//주식 추천")) {
+        var data = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/query1.php?hash=" + getHash()));
+        var json_data = {};
+        for (var key in data) {
+            json_data[key + "Name"] = data[key]["Name"];
+            json_data[key + "Desc"] = "예상: " + ((parseFloat(data[key]["Estimation"]) - 1) * 100).toFixed(2) + " % 현재: " + ((parseFloat(data[key]["RealValue"]) - 1) * 100).toFixed(2) + "%";
+        }
+
+        Kakao.send(room, {
+            "link_ver": "4.0",
+            "template_id": 23783,
+            "template_args": json_data
+        }, "custom");
+    } else if (msg.startsWith("//주식")) {
+        replier.reply("//주식 추천 → 머신러닝이 오늘 수익이 나올 것 같은 종목을 추천해줍니다!");
     }
 
     if (msg == "//팩토") {
@@ -745,7 +758,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 }
 
-//아래 4개의 메소드는 액티비티 화면을 수정할때 사용됩니다.
 function onCreate(savedInstanceState, activity) {
     AppData.clear();
 
