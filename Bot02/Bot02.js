@@ -17,8 +17,8 @@ const loh = {};
 
 const kalingModule = require("kalink").Kakao();
 const Kakao = new kalingModule;
-Kakao.init(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/password1.txt").trim());
-Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/password2.txt").trim());
+Kakao.init(FileStream.read("/storage/emulated/0/Bots/Bot02/password1.txt").trim());
+Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bot02/password2.txt").trim());
 
 const SD_directory = "/storage/029A-0F01/Bots/";
 
@@ -333,7 +333,7 @@ function getFinalSound(src) {
 }
 
 function getHash() {
-    return MD5(FileStream.read("/storage/emulated/0/Bots/Bots/Bot02/password3.txt").trim() + String(parseInt(Date.now() / 10000)));
+    return MD5(FileStream.read("/storage/emulated/0/Bots/Bot02/password3.txt").trim() + String(parseInt(Date.now() / 10000)));
 }
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
