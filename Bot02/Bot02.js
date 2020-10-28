@@ -20,7 +20,7 @@ const Kakao = new kalingModule;
 Kakao.init(FileStream.read("/storage/emulated/0/Bots/Bot02/password1.txt").trim());
 Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bot02/password2.txt").trim());
 
-const SD_directory = "/storage/029A-0F01/Bots/";
+const SD_directory = "Data/";
 
 const deny_list = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
 const clock_list = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
@@ -616,11 +616,19 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     } else if (msg == "//로오히 던전") {
         if (loh[room][0] == "") {
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39520,
+            }, "custom");
             replier.reply(prefix + "지금 던전(재앙의 경계)에 아무도 입장하지 않았습니다.\n'//로오히 입장' 명령어로 입장해 보세요.");
         } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000)) {
             replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
             loh[room] = ["", Date.now()];
         } else {
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39521,
+            }, "custom");
             replier.reply(prefix + "지금 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
@@ -643,16 +651,28 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 }, "custom");
             }
         } else {
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39521,
+            }, "custom");
             replier.reply(prefix + loh[room][0] + " 님께서 던전에 있어요! 잠시 기다려주세요!");
         }
         return;
     } else if (msg == "//로오히 퇴장") {
         if (loh[room][0] == "") {
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39520,
+            }, "custom");
             replier.reply(prefix + "아직 아무도 입장하지 않았어요.\n" + sender + " 님께서 입장하셔도 좋아요.");
         } else if (loh[room][0] == sender) {
             replier.reply(prefix + sender + " 님께서 던전에서 퇴장하셨습니다.");
             loh[room] = ["", Date.now()];
         } else if (loh[room][0] != sender) {
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39521,
+            }, "custom");
             replier.reply(prefix + sender + " 님이 아니라 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
