@@ -20,7 +20,7 @@ const Kakao = new kalingModule;
 Kakao.init(FileStream.read("/storage/emulated/0/Bots/Bot02/password1.txt").trim());
 Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bot02/password2.txt").trim());
 
-const SD_directory = "Data/";
+const SD_directory = "/storage/emulated/0/Bots/Bot02/Data/";
 
 const deny_list = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
 const clock_list = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
