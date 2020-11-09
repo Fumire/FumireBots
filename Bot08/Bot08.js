@@ -266,7 +266,7 @@ Utils.getTextFromWeb = function(url) {
 };
 
 function getHash() {
-    return MD5("Fumire" + String(parseInt(Date.now() / 10000)));
+    return MD5(FileStream.read("/storage/emulated/0/Bots/Bot08/password.txt").trim() + String(parseInt(Date.now() / 10000)));
 }
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
