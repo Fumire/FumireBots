@@ -22,7 +22,7 @@ Kakao.login("230@fumire.moe", FileStream.read("/storage/emulated/0/Bots/Bot02/pa
 
 const SD_directory = "/storage/emulated/0/Bots/Bot02/Data/";
 
-const deny_list = ["EE 전체 익명 단체 톡방", "Unist_CSE"];
+const deny_list = ["EE 전체 익명 단체 톡방", "[나대대] 나는 대한민국 대학원생이다", "Unist_CSE"];
 const clock_list = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
 
 var MD5 = function(string) {
