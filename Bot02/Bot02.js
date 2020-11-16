@@ -25,6 +25,15 @@ const SD_directory = "/storage/emulated/0/Bots/Bot02/Data/";
 const deny_list = ["EE 전체 익명 단체 톡방", "[나대대] 나는 대한민국 대학원생이다", "Unist_CSE"];
 const clock_list = ["[로드 오브 히어로즈] 시로미로 연합", "이망톡 봇톡스"];
 
+const loh_dungeon = {
+    "none": "지금 아무도 메기탕을 요리하지 않고 계십니다.\n'//로오히 입장' 명령어로 입장해 보세요.",
+    "consider": " 로드께서 20분이 지나 메기탕을 다 만드신 걸로 간주되었습니다.",
+    "someone": " 로드께서 지금 맛있는 메기탕을 조리하고 계십니다.",
+    "start": " 로드가 맛있는 메기탕 조리를 시작합니다! \n나오실 때 '//로오히 퇴장' 잊지 마세요!",
+    "ready": " 로드께서 메기탕을 맛있게 요리해도 좋아요!",
+    "end": " 로드께서 메기탕을 다 만드셨습니다!"
+};
+
 var MD5 = function(string) {
 
     function RotateLeft(lValue, iShiftBits) {
@@ -620,26 +629,38 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 "link_ver": "4.0",
                 "template_id": 39520,
             }, "custom");
-            replier.reply(prefix + "지금 던전(재앙의 경계)에 아무도 입장하지 않았습니다.\n'//로오히 입장' 명령어로 입장해 보세요.");
-        } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000)) {
-            replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
+            replier.reply(prefix + loh_dungeon["none"]);
+        } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (20 * 60 * 1000)) {
+            replier.reply(prefix + loh[room][0] + loh_dungeon["consider"]);
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39520,
+            }, "custom");
             loh[room] = ["", Date.now()];
         } else {
             Kakao.send(room, {
                 "link_ver": "4.0",
                 "template_id": 39521,
             }, "custom");
-            replier.reply(prefix + "지금 " + loh[room][0] + " 님께서 도전 중이십니다.");
+            replier.reply(prefix + loh[room][0] + loh_dungeon["someone"]);
         }
         return;
     } else if (msg == "//로오히 입장") {
-        if (loh[room][0] != "" && (Date.now() - loh[room][1]) > (15 * 60 * 1000)) {
-            replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
+        if (loh[room][0] != "" && (Date.now() - loh[room][1]) > (20 * 60 * 1000)) {
+            replier.reply(prefix + loh[room][0] + loh_dungeon["consider"]);
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39520,
+            }, "custom");
             loh[room] = ["", Date.now()];
         }
 
         if (loh[room][0] == "") {
-            replier.reply(prefix + sender + " 님께서 던전에 입장하셨습니다.\n나오실 때 '//로오히 퇴장' 잊지 마세요!");
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39521,
+            }, "custom");
+            replier.reply(prefix + sender + loh_dungeon["start"]);
             loh[room] = [sender, Date.now()];
             if (getProbability(95)) {
                 var cats = ["시로", "미로"];
@@ -655,7 +676,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 "link_ver": "4.0",
                 "template_id": 39521,
             }, "custom");
-            replier.reply(prefix + loh[room][0] + " 님께서 던전에 있어요! 잠시 기다려주세요!");
+            replier.reply(prefix + loh[room][0] + loh_dungeon["someone"]);
         }
         return;
     } else if (msg == "//로오히 퇴장") {
@@ -664,9 +685,14 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 "link_ver": "4.0",
                 "template_id": 39520,
             }, "custom");
-            replier.reply(prefix + "아직 아무도 입장하지 않았어요.\n" + sender + " 님께서 입장하셔도 좋아요.");
+            replier.reply(prefix + sender + loh_dungeon["ready"]);
         } else if (loh[room][0] == sender) {
-            replier.reply(prefix + sender + " 님께서 던전에서 퇴장하셨습니다.");
+            Kakao.send(room, {
+                "link_ver": "4.0",
+                "template_id": 39520,
+            }, "custom");
+
+            replier.reply(prefix + sender + loh_dungeon["end"]);
             loh[room] = ["", Date.now()];
         } else if (loh[room][0] != sender) {
             Kakao.send(room, {
@@ -676,8 +702,12 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(prefix + sender + " 님이 아니라 " + loh[room][0] + " 님께서 도전 중이십니다.");
         }
         return;
-    } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (15 * 60 * 1000)) {
-        replier.reply(prefix + loh[room][0] + "님께서 15분이 지나 퇴장한 것으로 간주되었습니다.");
+    } else if (loh[room][0] != "" && Date.now() - loh[room][1] > (20 * 60 * 1000)) {
+        replier.reply(prefix + loh[room][0] + loh_dungeon["consider"]);
+        Kakao.send(room, {
+            "link_ver": "4.0",
+            "template_id": 39520,
+        }, "custom");
         loh[room] = ["", Date.now()];
         return;
     } else if (msg == "//로오히 맵") {
