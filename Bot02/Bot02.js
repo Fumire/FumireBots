@@ -13,6 +13,7 @@ const prefix = "[봇] ";
 const probability = {};
 const typing = {};
 const wordquiz = {};
+const wordDifficulty = {};
 const loh = {};
 
 const kalingModule = require("kalink").Kakao();
@@ -345,6 +346,13 @@ function getHash() {
     return MD5(FileStream.read("/storage/emulated/0/Bots/Bot02/password3.txt").trim() + String(parseInt(Date.now() / 10000)));
 }
 
+function getDifficultyString(difficulty) {
+    if (difficulty == 1) return "기본";
+    else if (difficulty == 2) return "어려움";
+    else if (difficulty == 3) return "속담";
+    return "";
+}
+
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
     var minutes = new Date().getMinutes();
     if (minutes == "00") {
@@ -504,22 +512,31 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     if (wordquiz[room] == undefined) {
         wordquiz[room] = [0, "", ""];
     }
+    if (wordDifficulty[room] == undefined) {
+        wordDifficulty[room] = 1;
+    }
     if (msg == "//초성") {
-        replier.reply("//초성 시작 → 초성 퀴즈를 시작합니다!\n//초성 힌트 → 살짝 힌트를 볼 수 있어요!\n//초성 포기 → 초성 퀴즈를 포기합니다.\n//초성 점수 → 점수 현황을 볼 수 있어요!");
-        replier.reply("⭕: 맞으면 점수를 획득합니다.\n❌: 포기하면 5점을 잃습니다.\n⭐: 힌트를 보면 2점을 잃습니다.");
-        return;
-    } else if (msg.startsWith("//초성 시작")) {
+        replier.reply("//초성 도움 → 도움말을 확인합니다.\n현재 난이도: " + getDifficultyString(wordDifficulty[room]));
+    }
+
+    if (msg == "//초성" || msg.startsWith("//초성 시작")) {
+
         if (wordquiz[room][1] != "") {
             replier.reply(prefix + "이미 초성 퀴즈가 진행 중이에요!\n < " + getInitSound(wordquiz[room][1]) + " >\n→ 뜻: " + wordquiz[room][2]);
             return;
         }
 
-        if (msg == "//초성 시작 기본") {
+        if (msg == "//초성"){
+            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=" + wordDifficulty[room] + "&hash=" + getHash()).split("\n");
+        } else if (msg == "//초성 시작 기본") {
             wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
+            wordDifficulty[room] = 1;
         } else if (msg == "//초성 시작 어려움") {
             wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=2&hash=" + getHash()).split("\n");
+            wordDifficulty[room] = 2;
         } else if (msg == "//초성 시작 속담") {
             wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=3&hash=" + getHash()).split("\n");
+            wordDifficulty[room] = 3;
         } else {
             replier.reply("//초성 시작 기본 → 한국인이 많이 쓰는 5800단어에서 냅니다.\n//초성 시작 어려움 → 모든 단어를 사용합니다. 방언 및 북한말도 나옵니다.\n//초성 시작 속담 → 한국어 속담에서 냅니다.");
             return;
