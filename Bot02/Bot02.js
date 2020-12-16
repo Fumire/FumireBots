@@ -557,7 +557,10 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + Array.from(reg_sender).join("%20") + "&Action=-5&hash=" + getHash());
         wordquiz[room] = ["", "", ""];
         return;
-    } else if (getInitSound(msg) == getInitSound(wordquiz[room][1]) && wordquiz[room][1] != "") {
+    } else if (msg == "//초성 도움") {
+        replier.reply("//초성 시작 → 초성 퀴즈를 시작합니다!\n//초성 힌트 → 살짝 힌트를 볼 수 있어요!\n//초성 포기 → 초성 퀴즈를 포기합니다.\n//초성 점수 → 점수 현황을 볼 수 있어요!");
+        replier.reply("⭕: 맞으면 점수를 획득합니다.\n❌: 포기하면 5점을 잃습니다.\n⭐: 힌트를 보면 2점을 잃습니다.");
+    }   else if (getInitSound(msg) == getInitSound(wordquiz[room][1]) && wordquiz[room][1] != "") {
         if (msg == wordquiz[room][1]) {
             Kakao.send(room, {
                 "link_ver": "4.0",
