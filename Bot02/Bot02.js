@@ -517,7 +517,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         replier.reply("초성 퀴즈를 시작합니다!\n< " + getInitSound(wordquiz_data[room][1]) + " >\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 +1점 되었습니다.");
         Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=1&hash=" + getHash());
     } else if (msg == "//초성 힌트") {
-        if (wordquiz_data[room][0] == "") {
+        if (wordquiz_data[room][1] == "") {
             replier.reply(prefix + wordquiz_quotations["empty"]);
             return;
         }
@@ -533,7 +533,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 tmp = getRandomInt(0, wordquiz_data[room][1].length);
             }
             while (wordquiz_data[room][1].charAt(tmp) == " ")
-            replier.reply("초성 힌트: " + getInitSound(wordquiz_data[room][1].slice(0, tmp)) + "'" + wordquiz_data[room][1].charAt(tmp) + "'" + getInitSound(wordquiz_datat[room][1].slice(tmp + 1)) + "\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 2점 감점 되었습니다.");
+            replier.reply("초성 힌트: " + getInitSound(wordquiz_data[room][1].slice(0, tmp)) + "'" + wordquiz_data[room][1].charAt(tmp) + "'" + getInitSound(wordquiz_data[room][1].slice(tmp + 1)) + "\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 2점 감점 되었습니다.");
         }
         return;
     } else if (msg == "//초성 포기") {
