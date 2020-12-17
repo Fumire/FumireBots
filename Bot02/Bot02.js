@@ -536,7 +536,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         } else {
             var tmp = -1;
             do {
-                tmp = getRandomInt(0, wordquiz[room][1].length);
+                tmp = getRandomInt(0, wordquiz_data[room][1].length);
             }
             while (wordquiz_data[room][1].charAt(tmp) == " ")
             replier.reply("초성 힌트: " + getInitSound(wordquiz_data[room][1].slice(0, tmp)) + "'" + wordquiz_data[room][1].charAt(tmp) + "'" + getInitSound(wordquiz_datat[room][1].slice(tmp + 1)) + "\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 2점 감점 되었습니다.");
