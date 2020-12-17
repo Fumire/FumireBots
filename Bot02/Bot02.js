@@ -511,7 +511,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 
             level = wordquiz_levels[room] = "기본";
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
-            return;
         }
         wordquiz_data[room][0] = parseInt(wordquiz_data[room][0]);
 
