@@ -588,7 +588,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 replier.reply("[ " + sender + " ] 님, [" + msg + "]은 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % 입니다.\n→ 뜻: " + wordquiz_data[room][2] + "\n→ 초성: " + getInitSound(wordquiz_data[room][1]));
             }
             wordquiz_data[room][0] += 1;
-            replier.reply("얻을 수 있는 점수가 +1점 올라 " + String(wordquiz[room][0]) + " 점이 되었습니다.");
+            replier.reply("얻을 수 있는 점수가 +1점 올라 " + String(wordquiz_data[room][0]) + " 점이 되었습니다.");
         }
         return;
     } else if (msg == "//초성 점수") {
