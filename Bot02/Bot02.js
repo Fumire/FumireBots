@@ -1,8 +1,5 @@
 const prefix = "[봇] ";
 const probability = {};
-const typing = {};
-const wordquiz = {};
-const loh = {};
 
 const kalingModule = require("kalink").Kakao();
 const Kakao = new kalingModule;
@@ -51,8 +48,6 @@ const loh_quotations = {
     "ready": " 로드께서 메기탕을 맛있게 요리해도 좋아요!",
     "end": " 로드께서 메기탕을 다 만드셨습니다!"
 };
-
-const probability = {};
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
