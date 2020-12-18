@@ -476,7 +476,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     if (msg == "//초성") {
         replier.reply(help_messages["wordquiz"]);
         return;
-    } else if (msg.startsWith("//초성 시작")) {
+    } else if (msg.startsWith("//초성 시작") || msg.startsWith("//ㅊㅅ ㅅㅈ") || msg.startsWith("//ㅊㅅ")) {
         if (wordquiz_data[room][1] == "load") {
             replier.reply(prefix + wordquiz_quotations["loading"]);
             return;
@@ -489,7 +489,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         wordquiz_data[room][1] == "load";
         var level = "";
 
-        if (msg == "//초성 시작") {
+        if (msg == "//초성 시작" || msg == "//ㅊㅅ ㅅㅈ" || msg == "//ㅊㅅ") {
             level = wordquiz_levels[room];
         } else if (msg.split(" ").length < 3) {
             replier.reply(prefix + sender + wordquiz_quotations["typo"]);
@@ -565,9 +565,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         } else {
             var same = 0.0;
             for (var i = 0; i < msg.length; i++) {
-                if (getInitSound(msg.charAt(i)) == getInitSound(wordquiz_data[room][1].charAt(i))) {
-                    same += 1;
-                }
                 if (getMiddleSound(msg.charAt(i)) == getMiddleSound(wordquiz_data[room][1].charAt(i))) {
                     same += 1;
                 }
@@ -575,11 +572,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                     same += 1;
                 }
             }
-            same *= 100 / 3 / msg.length;
+            same *= 100 / 2 / msg.length;
             if (getFinalSound(msg.charAt(msg.length - 1)) == "") {
-                replier.reply("[ " + sender + " ] 님, [" + msg + "]는 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % 입니다.\n→ 뜻: " + wordquiz_data[room][2] + "\n→ 초성: " + getInitSound(wordquiz_data[room][1]));
+                replier.reply("[ " + sender + " ] 님, [" + msg + "]는 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % (초성 제외) 입니다.\n→ 뜻: " + wordquiz_data[room][2] + "\n→ 초성: " + getInitSound(wordquiz_data[room][1]));
             } else {
-                replier.reply("[ " + sender + " ] 님, [" + msg + "]은 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % 입니다.\n→ 뜻: " + wordquiz_data[room][2] + "\n→ 초성: " + getInitSound(wordquiz_data[room][1]));
+                replier.reply("[ " + sender + " ] 님, [" + msg + "]은 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % (초성 제외) 입니다.\n→ 뜻: " + wordquiz_data[room][2] + "\n→ 초성: " + getInitSound(wordquiz_data[room][1]));
             }
             wordquiz_data[room][0] += 1;
             replier.reply("얻을 수 있는 점수가 +1점 올라 " + String(wordquiz_data[room][0]) + " 점이 되었습니다.");
