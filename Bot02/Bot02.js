@@ -476,6 +476,27 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     if (msg == "//초성") {
         replier.reply(help_messages["wordquiz"]);
         return;
+    } else if (msg == "//초성 힌트" || msg == "//ㅊㅅ ㅎㅌ") {
+        if (wordquiz_data[room][1] == "") {
+            replier.reply(prefix + wordquiz_quotations["empty"]);
+            return;
+        }
+
+        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-2&hash=" + getHash());
+
+        if (wordquiz_data[room][1].length == 1) {
+            replier.reply(prefix + wordquiz_quotations["knavish"]);
+            return;
+        } else {
+            var tmp = -1;
+            do {
+                tmp = getRandomInt(0, wordquiz_data[room][1].length);
+            }
+            while (wordquiz_data[room][1].charAt(tmp) == " ")
+
+            replier.reply("초성 힌트: " + getInitSound(wordquiz_data[room][1].slice(0, tmp)) + "'" + wordquiz_data[room][1].charAt(tmp) + "'" + getInitSound(wordquiz_data[room][1].slice(tmp + 1)) + "\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 2점 감점 되었습니다.");
+        }
+        return;
     } else if (msg.startsWith("//초성 시작")) {
         if (wordquiz_data[room][1] == "load") {
             replier.reply(prefix + wordquiz_quotations["loading"]);
@@ -499,11 +520,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             level = wordquiz_levels[room] = msg.split(" ")[2];
         }
 
-        if (level == "기본") {
+        if (level == "기본" || level == "ㄱㅂ") {
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
-        } else if (level == "어려움") {
+        } else if (level == "어려움" || level == "ㅇㄹㅇ") {
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=2&hash=" + getHash()).split("\n");
-        } else if (level == "속담") {
+        } else if (level == "속담" || level == "ㅅㄷ") {
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=3&hash=" + getHash()).split("\n");
         } else {
             replier.reply(prefix + sender + wordquiz_quotations["typo"]);
@@ -539,44 +560,23 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             level = wordquiz_levels[room] = msg.split(" ")[2];
         }
 
-        if (level == "ㄱㅂ") {
+        if (level == "기본" || level == "ㄱㅂ") {
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
-        } else if (level == "ㅇㄹㅇ") {
+        } else if (level == "어려움" || level == "ㅇㄹㅇ") {
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=2&hash=" + getHash()).split("\n");
-        } else if (level == "ㅅㄷ") {
+        } else if (level == "속담" || level == "ㅅㄷ") {
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=3&hash=" + getHash()).split("\n");
         } else {
             replier.reply(prefix + sender + wordquiz_quotations["typo"]);
             Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-1&hash=" + getHash());
 
-            level = wordquiz_levels[room] = "기본";
+            level = wordquiz_levels[room] = "ㄱㅂ";
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
         }
         wordquiz_data[room][0] = parseInt(wordquiz_data[room][0]);
 
         replier.reply("초성 퀴즈를 시작합니다!\n< " + getInitSound(wordquiz_data[room][1]) + " >\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 +1점 되었습니다.");
         Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=1&hash=" + getHash());
-    } else if (msg == "//초성 힌트") {
-        if (wordquiz_data[room][1] == "") {
-            replier.reply(prefix + wordquiz_quotations["empty"]);
-            return;
-        }
-
-        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-2&hash=" + getHash());
-
-        if (wordquiz_data[room][1].length == 1) {
-            replier.reply(prefix + wordquiz_quotations["knavish"]);
-            return;
-        } else {
-            var tmp = -1;
-            do {
-                tmp = getRandomInt(0, wordquiz_data[room][1].length);
-            }
-            while (wordquiz_data[room][1].charAt(tmp) == " ")
-
-            replier.reply("초성 힌트: " + getInitSound(wordquiz_data[room][1].slice(0, tmp)) + "'" + wordquiz_data[room][1].charAt(tmp) + "'" + getInitSound(wordquiz_data[room][1].slice(tmp + 1)) + "\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 2점 감점 되었습니다.");
-        }
-        return;
     } else if (msg == "//초성 포기") {
         if (wordquiz_data[room][0] == "") {
             replier.reply(prefix + wordquiz_quotations["empty"]);
