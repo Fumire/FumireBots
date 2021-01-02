@@ -17,7 +17,7 @@ const help_messages = {
     "stock": "//주식 추천 → 머신러닝이 오늘 수익이 나올 것 같은 종목을 추천해줍니다!",
     "typing": "//타자 시작 → 타자 연습을 시작합니다.\n//타자 포기 → 타자 연습을 포기합니다.",
     "wordquiz": "//초성 시작 → 초성 퀴즈를 시작합니다!\n//초성 힌트 → 살짝 힌트를 볼 수 있어요!\n//초성 포기 → 초성 퀴즈를 포기합니다.\n//초성 점수 → 점수 현황을 볼 수 있어요!\n⭕: 맞으면 점수를 획득합니다.\n❌: 포기하면 5점을 잃습니다.\n⭐: 힌트를 보면 2점을 잃습니다.",
-    "loh": "//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 맵 → 경험치 및 골드 획득량을 미리 확인하세요!",
+    "loh": "//로오히 던전 → 딜 손실을 막기 위해 한 명씩 차례로 들어가요!\n//로오히 맵 → 경험치 및 골드 획득량을 미리 확인하세요!\n//로오히 (숫자) → 그랜절로 죄송함을 표현하세요!",
 };
 
 const typing_data = {};
@@ -41,10 +41,10 @@ const wordquiz_quotations = {
 
 const loh_dungeon = {};
 const loh_quotations = {
-    "none": "지금 아무도 메기탕을 요리하지 않고 계십니다.\n'//로오히 입장' 명령어로 입장해 보세요.",
+    "none": "지금 아무도 메기탕을 요리하지 않고 계십니다.\n< //로오히 입장 > 명령어로 입장해 보세요.",
     "consider": " 로드께서 20분이 지나 메기탕을 다 만드신 걸로 간주되었습니다.",
     "someone": " 로드께서 지금 맛있는 메기탕을 조리하고 계십니다.",
-    "start": " 로드가 맛있는 메기탕 조리를 시작합니다! \n나오실 때 '//로오히 퇴장' 잊지 마세요!",
+    "start": " 로드가 맛있는 메기탕 조리를 시작합니다! \n나오실 때 < //로오히 퇴장 > 잊지 마세요!",
     "ready": " 로드께서 메기탕을 맛있게 요리해도 좋아요!",
     "end": " 로드께서 메기탕을 다 만드셨습니다!"
 };
@@ -444,8 +444,8 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             }
         }, "custom");
         return;
-    } else if (typing_data[room][sender][0] == msg && typing[room][sender][0] != "") {
-        var seconds = (Date.now() - typing[room][sender][2]) / 1000;
+    } else if (typing_data[room][sender][0] == msg && typing_data[room][sender][0] != "") {
+        var seconds = (Date.now() - typing_data[room][sender][2]) / 1000;
         var tasu = typing_data[room][sender][1] / seconds * 60;
 
         replier.reply("[ " + sender + " ] 님의 타자 실력:\n→ 걸린 시간: " + String(seconds) + " 초\n→ 분당 타수: " + tasu.toFixed(3) + " 타/분");
@@ -459,7 +459,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         if (typing_data[room][sender][0] == "") {
             replier.reply(typing_quotations["empty"]);
         } else {
-            typing[room][sender] = ["", 0, Date.now(), -1];
+            typing_data[room][sender] = ["", 0, Date.now(), -1];
             replier.reply(typing_quotations["giveup"]);
         }
         return;
@@ -476,7 +476,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     if (msg == "//초성") {
         replier.reply(help_messages["wordquiz"]);
         return;
-    } else if (msg.startsWith("//초성 시작") || msg.startsWith("//ㅊㅅ ㅅㅈ") || msg.startsWith("//ㅊㅅ")) {
+    } else if (msg.startsWith("//초성 시작")) {
         if (wordquiz_data[room][1] == "load") {
             replier.reply(prefix + wordquiz_quotations["loading"]);
             return;
@@ -489,7 +489,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         wordquiz_data[room][1] == "load";
         var level = "";
 
-        if (msg == "//초성 시작" || msg == "//ㅊㅅ ㅅㅈ" || msg == "//ㅊㅅ") {
+        if (msg == "//초성 시작") {
             level = wordquiz_levels[room];
         } else if (msg.split(" ").length < 3) {
             replier.reply(prefix + sender + wordquiz_quotations["typo"]);
@@ -504,6 +504,46 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         } else if (level == "어려움") {
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=2&hash=" + getHash()).split("\n");
         } else if (level == "속담") {
+            wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=3&hash=" + getHash()).split("\n");
+        } else {
+            replier.reply(prefix + sender + wordquiz_quotations["typo"]);
+            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-1&hash=" + getHash());
+
+            level = wordquiz_levels[room] = "기본";
+            wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
+        }
+        wordquiz_data[room][0] = parseInt(wordquiz_data[room][0]);
+
+        replier.reply("초성 퀴즈를 시작합니다!\n< " + getInitSound(wordquiz_data[room][1]) + " >\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 +1점 되었습니다.");
+        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=1&hash=" + getHash());
+    } else if (msg.startsWith("//ㅊㅅ")) {
+        if (wordquiz_data[room][1] == "load") {
+            replier.reply(prefix + wordquiz_quotations["loading"]);
+            return;
+        } else if (wordquiz_data[room][1] != "") {
+            replier.reply(prefix + wordquiz_quotations["already"]);
+            replier.reply("< " + getInitSound(wordquiz_data[room][1]) + " >\n→ 뜻: " + wordquiz_data[room][2]);
+            return;
+        }
+
+        wordquiz_data[room][1] == "load";
+        var level = "";
+
+        if (msg == "//ㅊㅅ" || msg == "//ㅊㅅ ㅅㅈ") {
+            level = wordquiz_levels[room];
+        } else if (msg.split(" ").length < 3) {
+            replier.reply(prefix + sender + wordquiz_quotations["typo"]);
+            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-1&hash=" + getHash());
+            level = wordquiz_levels[room];
+        } else {
+            level = wordquiz_levels[room] = msg.split(" ")[2];
+        }
+
+        if (level == "ㄱㅂ") {
+            wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
+        } else if (level == "ㅇㄹㅇ") {
+            wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=2&hash=" + getHash()).split("\n");
+        } else if (level == "ㅅㄷ") {
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=3&hash=" + getHash()).split("\n");
         } else {
             replier.reply(prefix + sender + wordquiz_quotations["typo"]);
@@ -533,6 +573,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 tmp = getRandomInt(0, wordquiz_data[room][1].length);
             }
             while (wordquiz_data[room][1].charAt(tmp) == " ")
+
             replier.reply("초성 힌트: " + getInitSound(wordquiz_data[room][1].slice(0, tmp)) + "'" + wordquiz_data[room][1].charAt(tmp) + "'" + getInitSound(wordquiz_data[room][1].slice(tmp + 1)) + "\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 2점 감점 되었습니다.");
         }
         return;
@@ -598,7 +639,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 
         replier.reply(prefix + wordquiz_quotations["every"]);
         return;
-    }else if (msg == "//초성 점수 모두") {
+    } else if (msg == "//초성 점수 모두") {
         replier.reply(Utils.getTextFromWeb("https://fumire.moe/bots/wordscore2.php?Room=" + encodeURIComponent(room) + "&hash=" + getHash()));
         return;
     }
@@ -632,7 +673,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(prefix + loh_dungeon[room][0] + loh_quotations["someone"]);
         }
         return;
-    } else if (msg == "//로오히 입장") {
+    } else if (msg == "//로오히 입장" || msg == "//ㅇㅈ") {
         if (loh_dungeon[room][0] != "" && (Date.now() - loh_dungeon[room][1]) > (20 * 60 * 1000)) {
             replier.reply(prefix + loh_dungeon[room][0] + loh_quotations["consider"]);
             Kakao.send(room, {
@@ -666,7 +707,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(prefix + loh_dungeon[room][0] + loh_quotations["someone"]);
         }
         return;
-    } else if (msg == "//로오히 퇴장") {
+    } else if (msg == "//로오히 퇴장" || msg == "//ㅌㅈ") {
         if (loh_dungeon[room][0] == "") {
             Kakao.send(room, {
                 "link_ver": "4.0",
@@ -750,6 +791,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply("골드 획득량은 달라질 수도 있습니다.");
         }
         return;
+    } else if (/\/\/로오히 [\d]+/.test(msg) == true || /\/\/ㄹㅇㅎ [\d]+/.test(msg) == true) {
+        Kakao.send(room, {
+            "link_ver": "4.0",
+            "template_id": 43921,
+            "template_args": {}
+        }, "custom");
+        replier.reply(prefix + sender + " 로드님께서 " + msg.split(" ")[1] + "의 체력을 남겨 무척 죄송해하십니다.");
     }
 
     if (probability[room] == undefined) {
