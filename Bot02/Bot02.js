@@ -673,7 +673,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(prefix + loh_dungeon[room][0] + loh_quotations["someone"]);
         }
         return;
-    } else if (msg == "//로오히 입장" || msg == "//ㅇㅈ") {
+    } else if (msg == "//로오히 입장" || msg == "//입장" || msg == "//ㅇㅈ") {
         if (loh_dungeon[room][0] != "" && (Date.now() - loh_dungeon[room][1]) > (20 * 60 * 1000)) {
             replier.reply(prefix + loh_dungeon[room][0] + loh_quotations["consider"]);
             Kakao.send(room, {
@@ -707,7 +707,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(prefix + loh_dungeon[room][0] + loh_quotations["someone"]);
         }
         return;
-    } else if (msg == "//로오히 퇴장" || msg == "//ㅌㅈ") {
+    } else if (msg == "//로오히 퇴장" || msg == "//퇴장" || msg == "//ㅌㅈ") {
         if (loh_dungeon[room][0] == "") {
             Kakao.send(room, {
                 "link_ver": "4.0",
