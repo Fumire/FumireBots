@@ -46,7 +46,8 @@ const loh_quotations = {
     "someone": " 로드께서 지금 맛있는 메기탕을 조리하고 계십니다.",
     "start": " 로드가 맛있는 메기탕 조리를 시작합니다! \n나오실 때 < //로오히 퇴장 > 잊지 마세요!",
     "ready": " 로드께서 메기탕을 맛있게 요리해도 좋아요!",
-    "end": " 로드께서 메기탕을 다 만드셨습니다!"
+    "end": " 로드께서 메기탕을 다 만드셨습니다!",
+    "map": "이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n→ //로오히 맵 하드 3-4\n→ //로오히 맵 엘리트 5-6\n❗엘리트는 '6 페르사'까지만 찾아볼 수 있어요❗"
 };
 
 function getRandomInt(min, max) {
@@ -59,6 +60,10 @@ function getProbability(probability) {
 
 function randomPicker(arr) {
     return arr[Math.floor(Math.random() * arr.length)]
+}
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function getInitSound(text) {
@@ -375,6 +380,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     msg = msg.trim();
     sender = sender.trim();
     room = room.trim();
+
+    if (isGroupChat == false) {
+        //replier.reply("안녕하세요? 혹시 진짜 사람을 찾아오신 거라면 다음 프로필을 참조해주세요.\nhttps://open.kakao.com/me/Fumire");
+        //return;
+    }
 
     if (isGroupChat == true && deny_list.includes(room) == true) {
         return;
@@ -739,7 +749,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         loh_dungeon[room] = ["", Date.now()];
         return;
     } else if (msg == "//로오히 맵") {
-        replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n→ //로오히 맵 하드 3-4");
+        replier.reply(loh_quotations["map"]);
         return;
     } else if (msg.startsWith("//로오히 맵")) {
         var exp_data = null;
@@ -747,11 +757,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         var token = msg.split(" ");
 
         if (token.length != 4) {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n→ //로오히 맵 하드 3-4");
+            replier.reply(loh_quotations["map"]);
             return;
         }
 
-        if (token[2] == "노말" || token[2] == "하드") {
+        if (token[2] == "노말" || token[2] == "하드" || token[2] == "엘리트") {
             var data = JSON.parse(FileStream.read(SD_directory + token[2] + "-exp.json"));
             for (var key in data) {
                 if (data[key]["스테이지"].startsWith(token[3])) {
@@ -766,11 +776,8 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                     break;
                 }
             }
-        } else if (token[2] == "엘리트") {
-            replier.reply("아직 준비 중이에요.");
-            return;
         } else {
-            replier.reply("이렇게 명령해주세요\n→ //로오히 맵 노말 1-2\n→ //로오히 맵 하드 3-4");
+            replier.reply(loh_quotations["map"]);
             return;
         }
 
@@ -781,8 +788,8 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 "link_ver": "4.0",
                 "template_id": 31584,
                 "template_args": {
-                    "0": exp_data["적 전투력"],
-                    "1": exp_data["총 경험치"],
+                    "0": numberWithCommas(exp_data["적 전투력"]),
+                    "1": numberWithCommas(exp_data["총 경험치"]),
                     "2": gold_data["평균"].toFixed(2),
                     "3": exp_data["행동력 당 경험치"].toFixed(2),
                     "4": gold_data["행동력 당 골드"].toFixed(2)
