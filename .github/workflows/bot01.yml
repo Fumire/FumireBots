@@ -1,0 +1,13 @@
+name: Bot01 Docker Image CI
+
+on:
+  push:
+    paths: [ Bot01/Dockerfile ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build Bot01
