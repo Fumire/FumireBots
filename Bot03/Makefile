@@ -1,22 +1,19 @@
 IMAGE_NAME = bot03
-CONTAINER_NAME = Bot03
 
 all:
-.PHONY += all
+.PHONY:= all
 
 build: Dockerfile
 	docker build --rm --tag $(IMAGE_NAME) .
+.PHONY: build
 
 delete:
 	docker rmi $(IMAGE_NAME)
+.PHONY: delete
 
 start:
-	docker run --name $(CONTAINER_NAME) --rm --detach --volume $(abspath .):/usr/src/app --publish 1234:3306 $(IMAGE_NAME)
+	docker run --rm --detach --volume $(abspath .):/usr/src/app --publish-all $(IMAGE_NAME)
+.PHONY: start
 
 test:
-	docker run --name $(CONTAINER_NAME) --rm -it --volume $(abspath .):/usr/src/app --publish 1234:3306 $(IMAGE_NAME)
-
-
-stop:
-	docker stop $(CONTAINER_NAME)
-	docker rm $(CONTAINER_NAME)
+	docker run --rm -it --volume $(abspath .):/usr/src/app --publish 1234:3306 $(IMAGE_NAME)
