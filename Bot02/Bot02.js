@@ -344,8 +344,8 @@ Utils.getTextFromWeb = function(url) {
         var con = url.openConnection();
 
         if (con != null) {
-            con.setConnectTimeout(5000);
-            con.setUseCaches(false);
+            con.setConnectTimeout(10000);
+            con.setUseCaches(true);
             var isr = new java.io.InputStreamReader(con.getInputStream());
             var br = new java.io.BufferedReader(isr);
             var str = br.readLine();
@@ -543,6 +543,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             level = wordquiz_levels[room] = "기본";
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
         }
+
         wordquiz_data[room][0] = parseInt(wordquiz_data[room][0]);
 
         replier.reply("초성 퀴즈를 시작합니다!\n< " + getInitSound(wordquiz_data[room][1]) + " >\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 +1점 되었습니다.");
@@ -584,6 +585,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             wordquiz_data[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
         }
         wordquiz_data[room][0] = parseInt(wordquiz_data[room][0]);
+
+        if (wordquiz_data[room][1] == undefined) {
+            replier.reply(prefix + "뭔가 문제가 생겼어요!");
+
+            wordquiz_data[room] = ["", "", ""];
+            return;
+        }
 
         replier.reply("초성 퀴즈를 시작합니다!\n< " + getInitSound(wordquiz_data[room][1]) + " >\n→ 뜻: " + wordquiz_data[room][2] + "\n[ " + sender + " ] 님의 점수가 +1점 되었습니다.");
         Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=1&hash=" + getHash());
