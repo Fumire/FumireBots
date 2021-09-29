@@ -1,7 +1,5 @@
-FROM python:3
-
+FROM python:3.9.7
 WORKDIR /usr/src/app
-
-RUN pip install --no-cache-dir pymysql twint
-
+RUN pip install --no-cache-dir PyMySQL==1.0.2 twint==2.1.20
+EXPOSE 3306
 ENTRYPOINT ["python3", "run.py"]
