@@ -825,7 +825,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     } else if (msg == "//speak") {
         if (probability[room] > 10) {
             probability[room] -= 10;
-            replier.reply(prefix + (100 - probability[room]).toString() + " % 이하의 확률로 말합니다!");
+            replier.reply(prefix + (100 - probability[room]).toString() + " %의 확률로 말합니다!");
         } else {
             replier.reply(prefix + "이미 많이 떠들고 있는 걸요!");
         }
@@ -833,20 +833,20 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     } else if (msg == "//quiet") {
         if (probability[room] < 90) {
             probability[room] += 10;
-            replier.reply(prefix + (100 - probability[room]).toString() + " % 이하의 확률로 말합니다!");
+            replier.reply(prefix + (100 - probability[room]).toString() + " %의 확률로 말합니다!");
         } else {
             replier.reply(prefix + "읍읍읍!");
         }
         return;
     }
 
-    if (/[ㅋ]+$/.test(msg) == true) {
+    if (/[ㅋ]+$/.test(msg) == true && !msg.endswith("ㅇㅋ") && !msg.endswith("ㄹㅇㅋㅋ")) {
         if (getProbability(probability[room])) return;
         replier.reply(prefix + "ㅋ".repeat(getRandomInt(1, 10)));
         return;
     }
 
-    if (/[ㅎ]+$/.test(msg) == true) {
+    if (/[ㅎ]+$/.test(msg) == true && !msg.endswith("ㅇㅎ")) {
         if (getProbability(probability[room])) return;
         replier.reply(prefix + "ㅎ".repeat(getRandomInt(1, 10)));
         return;
