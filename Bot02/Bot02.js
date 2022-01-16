@@ -12,6 +12,11 @@ const helpMessages = {
     "stock": "//주식 추천 → 머신러닝이 오늘 수익이 나올 것 같은 종목을 추천해줍니다!",
     "wordquiz": "//초성 시작 → 초성 퀴즈를 시작합니다!\n//초성 힌트 → 살짝 힌트를 볼 수 있어요!\n//초성 포기 → 초성 퀴즈를 포기합니다.\n//초성 점수 → 점수 현황을 볼 수 있어요!\n⭕: 맞으면 점수를 획득합니다.\n❌: 포기하면 점수를 잃습니다.\n⭐: 힌트를 보면 점수를 잃습니다.",
 };
+const speakMessages = {
+    "shutup": "읍읍읍!",
+    "probability": " %의 확률로 말합니다!",
+    "already": "이미 많이 떠들고 있는 걸요!",
+};
 const stockMessages = {
     "ask": "추천 받으셨으니 광고 한 번 눌러주실래요?\nhttps://fumire.moe/stock",
 };
@@ -151,13 +156,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     if (isGroupChat == true && denyList.includes(room) == true) {
-        if (/[ㅋ]+$/.test(msg) == true && !msg.endswith("ㅇㅋ") && !msg.endswith("ㄹㅇㅋㅋ")) {
+        if (/[ㅋ]+$/.test(msg) == true && !msg.endsWith("ㅇㅋ") && !msg.endsWith("ㄹㅇㅋㅋ")) {
             if (getProbability(probability[room])) {
                 replier.reply(room, "ㅋ".repeat(getRandomInt(1, 10)));
             }
         }
 
-        if (/[ㅎ]+$/.test(msg) == true && !msg.endswith("ㅇㅎ")) {
+        if (/[ㅎ]+$/.test(msg) == true && !msg.endsWith("ㅇㅎ")) {
             if (getProbability(probability[room])) {
                 replier.reply(room, "ㅎ".repeat(getRandomInt(1, 10)));
             }
@@ -361,6 +366,48 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     } else if (msg == "//초성 점수") {
         replier.reply(Utils.getTextFromWeb("https://fumire.moe/bots/wordscore2.php?Room=" + encodeURIComponent(room) + "&hash=" + getHash()));
         return;
+    }
+
+    if (msg == "//shutup") {
+        probability[room] = 100;
+        replier.reply(room, speakMessages["shutup"]);
+    } else if (msg == "//speak") {
+        if (probability[room] <= 95) {
+            probability[room] += 5;
+            replier.reply(room, probability[room].toString() + speakMessages["probability"]);
+        } else {
+            replier.reply(room, speakMessages["already"]);
+        }
+        return;
+    } else if (msg == "//quiet") {
+        if (probability[room] >= 5) {
+            probability[room] -= 5;
+            replier.reply(room, probability[room].toString() + speakMessages["probability"]);
+        } else {
+            replier.reply(room, speakMessages["shutup"]);
+        }
+        return;
+    }
+
+    if (/[ㅋ]+$/.test(msg) == true && !msg.endsWith("ㅇㅋ") && !msg.endsWith("ㄹㅇㅋㅋ")) {
+        if (getProbability(probability[room])) {
+            replier.reply(room, "ㅋ".repeat(getRandomInt(1, 10)));
+            return;
+        }
+    }
+
+    if (/[ㅎ]+$/.test(msg) == true && !msg.endsWith("ㅇㅎ")) {
+        if (getProbability(probability[room])) {
+            replier.reply(room, "ㅎ".repeat(getRandomInt(1, 10)));
+            return;
+        }
+    }
+
+    if (/[ㅠㅜ]+$/.test(msg) == true) {
+        if (getProbability(probability[room])) {
+            replier.reply(room, "ㅠ".repeat(getRandomInt(1, 10)));
+            return;
+        }
     }
 
     if (/마법의(|\s)소라고(동|둥)님(\S|\s)+(요|죠)\?/.test(msg) == true) {
