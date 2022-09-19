@@ -270,7 +270,7 @@ function getHash() {
 }
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    Utils.getTextFromWeb("https://fumire.moe/bots/addword2.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Message=" + encodeURIComponent(msg) + "&hash=" + getHash());
+    Utils.getTextFromWeb("https://fumire.moe/bots/addword2?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(MD5(imageDB.getProfileImage())) + "&Message=" + encodeURIComponent(msg) + "&Hash=" + getHash());
 }
 
 //아래 4개의 메소드는 액티비티 화면을 수정할때 사용됩니다.

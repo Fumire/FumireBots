@@ -145,8 +145,14 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     msg = msg.trim();
     sender = sender.trim();
     room = room.trim();
+    profile = md5(imageDB.getProfileImage());
 
-    if (isGroupChat == false) {
+    if (isGroupChat == true)
+    {
+        return;
+    }
+
+    if (isGroupChat == false && false) {
         replier.reply(helpMessages["introduce"]);
         return;
     }
@@ -188,11 +194,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     if (msg == "//주식 추천") {
-        var data = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/query1.php?hash=" + getHash()));
+        var data = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/query1?hash=" + getHash()));
         var reply = "";
         for (var key in data) {
-            reply += String(parseInt(key) + 1) + "위! " + data[key]["Name"] + "(" + data[key]["Code"] + ")\n"
-            reply += "→ 예상: " + ((parseFloat(data[key]["Estimation"]) - 1) * 100).toFixed(2) + " % 현재: " + ((parseFloat(data[key]["RealValue"]) - 1) * 100).toFixed(2) + "%\n";
+            reply += String(parseInt(key) + 1) + "위! " + data[key]["Name"] + " (" + data[key]["Code"] + ")\n"
+            reply += "→ 예상: " + ((parseFloat(data[key]["Estimation"]) - 1) * 100).toFixed(3) + " % 현재: " + ((parseFloat(data[key]["RealValue"]) - 1) * 100).toFixed(3) + "%\n";
         }
 
         replier.reply(room, reply);
@@ -205,166 +211,128 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     if (wordquiz[room] == undefined) {
-        wordquiz[room] = [0, "", "", "어려움"];
+        wordquiz[room] = {"score": 0, "word": "", "chosung": "", "meaning": "", "level": "basic"};
     } else if (msg == "//초성 힌트" || msg == "//ㅊㅅ ㅎㅌ") {
-        if (wordquiz[room][1] == "") {
+        if (wordquiz[room]["word"] == "") {
             replier.reply(room, wordquizMessages["empty"]);
             return;
         }
 
         var bomb = String(getRandomInt(5, 10));
-        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-" + bomb + "&hash=" + getHash());
+        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&Action=-" + bomb + "&hash=" + getHash());
 
-        if (wordquiz[room][1].length == 1) {
+        if (wordquiz[room]["word"].length == 1) {
             replier.reply(room, wordquizMessages["knavish"]);
             return;
         } else {
             var tmp = -1;
             do {
-                tmp = getRandomInt(0, wordquiz[room][1].length);
+                tmp = getRandomInt(0, wordquiz[room]["word"].length);
             }
-            while (wordquiz[room][1].charAt(tmp) == " ")
+            while (wordquiz[room]["word"].charAt(tmp) == " ")
 
-            replier.reply("초성 힌트: " + getInitSound(wordquiz[room][1].slice(0, tmp)) + "'" + wordquiz[room][1].charAt(tmp) + "'" + getInitSound(wordquiz[room][1].slice(tmp + 1)) + "\n→ 뜻: " + wordquiz[room][2] + "\n[ " + sender + " ] 님의 점수가 " + bomb + "점 감점 되었습니다.");
+            replier.reply("초성 힌트: " + wordquiz[room]["chosung"].slice(0, tmp) + "'" + wordquiz[room]["word"].charAt(tmp) + "'" + wordquiz[room]["chosung"].slice(tmp + 1) + "\n→ 뜻: " + wordquiz[room]["meaning"] + "\n[ " + sender + " ] 님의 점수가 " + bomb + "점 감점 되었습니다.");
         }
         return;
-    } else if (msg.startsWith("//초성 시작")) {
-        if (wordquiz[room][1] == "load") {
+    } else if (msg.startsWith("//초성 시작") || msg.startsWith("//ㅊㅅ ㅅㅈ") || msg.startsWith("//ㅊㅅ")) {
+        if (wordquiz[room]["word"] == "load") {
             replier.reply(room, wordquizMessages["loading"]);
             return;
-        } else if (wordquiz[room][1] != "") {
+        } else if (wordquiz[room]["word"] != "") {
             replier.reply(room, wordquizMessages["already"]);
             replier.reply("< " + getInitSound(wordquiz[room][1]) + " >\n→ 뜻: " + wordquiz[room][2]);
             return;
         }
 
-        wordquiz[room][1] == "load";
+        wordquiz[room]["word"] == "load";
         var level = "";
 
-        if (msg == "//초성 시작") {
-            level = wordquiz[room][3];
+        if (msg == "//초성 시작" || msg == "//ㅊㅅ ㅅㅈ" || msg == "//ㅊㅅ") {
+            level = wordquiz[room]["level"];
         } else if (msg.split(" ").length != 3) {
             replier.reply(room, sender + wordquizMessages["typo"]);
-            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-1&hash=" + getHash());
-            level = wordquiz[room][3];
+            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&Action=-1&hash=" + getHash());
+            level = wordquiz[room]["level"];
         } else {
-            level = wordquiz[room][3] = msg.split(" ")[2];
+            level = wordquiz[room]["level"] = msg.split(" ")[2];
         }
 
-        if (level == "기본" || level == "ㄱㅂ") {
-            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
-        } else if (level == "어려움" || level == "ㅇㄹㅇ") {
-            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=2&hash=" + getHash()).split("\n");
-        } else if (level == "속담" || level == "ㅅㄷ") {
-            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=3&hash=" + getHash()).split("\n");
-        } else {
-            replier.reply(room, sender + wordquizMessages["typo"]);
-            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-1&hash=" + getHash());
-
-            level = wordquiz[room][4] = "기본";
-            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
-        }
-
-        wordquiz[room].push(level);
-        wordquiz[room][0] = parseInt(wordquiz[room][0]);
-
-        replier.reply(room, "초성 퀴즈를 시작합니다!\n< " + getInitSound(wordquiz[room][1]) + " >\n→ 뜻: " + wordquiz[room][2] + "\n[ " + sender + " ] 님의 점수가 +1점 되었습니다.");
-        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=1&hash=" + getHash());
-        return;
-    } else if (msg.startsWith("//ㅊㅅ")) {
-        if (wordquiz[room][1] == "load") {
-            replier.reply(room, wordquizMessages["loading"]);
-            return;
-        } else if (wordquiz[room][1] != "") {
-            replier.reply(room, wordquizMessages["already"]);
-            replier.reply("< " + getInitSound(wordquiz[room][1]) + " >\n→ 뜻: " + wordquiz[room][2]);
-            return;
-        }
-
-        wordquiz[room][1] == "load";
-        var level = "";
-
-        if (msg == "//ㅊㅅ" || msg == "//ㅊㅅ ㅅㅈ") {
-            level = wordquiz[room][3];
-        } else if (msg.split(" ").length != 3) {
-            replier.reply(room, sender + wordquizMessages["typo"]);
-            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-1&hash=" + getHash());
-            level = wordquiz[room][3];
-        } else {
-            level = wordquiz[room][3] = msg.split(" ")[2];
-        }
-
-        if (level == "기본" || level == "ㄱㅂ") {
-            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
-        } else if (level == "어려움" || level == "ㅇㄹㅇ") {
-            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=2&hash=" + getHash()).split("\n");
-        } else if (level == "속담" || level == "ㅅㄷ") {
-            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=3&hash=" + getHash()).split("\n");
+        if (level == "기본" || level == "ㄱㅂ" || level == "basic") {
+            wordquiz[room] = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz?word=basic&hash=" + getHash()));
+            level = wordquiz[room]["level"] = "basic";
+        } else if (level == "보통" || level == "ㅂㅌ" || level == "hard") {
+            wordquiz[room] = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz?word=hard&hash=" + getHash()));
+            level = wordquiz[room]["level"] = "hard";
+        } else if (level == "어려움" || level == "ㅇㄹㅇ" || level == "extreme_hard") {
+            wordquiz[room] = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz?word=extreme_hard&hash=" + getHash()));
+            level = wordquiz[room]["level"] = "extreme_hard";
         } else {
             replier.reply(room, sender + wordquizMessages["typo"]);
-            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-1&hash=" + getHash());
-
-            level = wordquiz[room][4] = "기본";
-            wordquiz[room] = Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz.php?word=1&hash=" + getHash()).split("\n");
+            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&Action=-1&hash=" + getHash());
+            wordquiz[room] = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/wordquiz?word=basic&hash=" + getHash()));
+            level = wordquiz[room]["level"] = "basic";
         }
 
-        wordquiz[room].push(level);
-        wordquiz[room][0] = parseInt(wordquiz[room][0]);
-
-        replier.reply(room, "초성 퀴즈를 시작합니다!\n< " + getInitSound(wordquiz[room][1]) + " >\n→ 뜻: " + wordquiz[room][2] + "\n[ " + sender + " ] 님의 점수가 +1점 되었습니다.");
-        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=1&hash=" + getHash());
+        replier.reply(room, "초성 퀴즈를 시작합니다!\n< " + wordquiz[room]["chosung"] + " >\n→ 뜻: " + wordquiz[room]["meaning"] + "\n[ " + sender + " ] 님의 점수가 +1점 되었습니다.");
+        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&Action=1&hash=" + getHash());
         return;
     } else if (msg == "//초성 포기") {
-        if (wordquiz[room][0] == "") {
+        if (wordquiz[room]["word"] == "") {
             replier.reply(room, wordquizMessages["empty"]);
             return;
         }
 
         var bomb = String(getRandomInt(5, 100));
-        replier.reply(room, "초성 퀴즈를 포기했습니다.\n정답은 '" + wordquiz[room][1] + "' 이었습니다!" + "\n[ " + sender + " ] 님의 점수가 " + bomb + "점 감점 되었습니다.");
-        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=-" + bomb + "&hash=" + getHash());
+        replier.reply(room, "초성 퀴즈를 포기했습니다.\n정답은 '" + wordquiz[room]["word"] + "' 이었습니다!" + "\n[ " + sender + " ] 님의 점수가 " + bomb + "점 감점 되었습니다.");
+        Utils.getTextFromWeb("https://fumire.moe/bots/wordscore?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&Action=-" + bomb + "&hash=" + getHash());
         wordquiz[room] = ["", "", "", wordquiz[room][3]];
         return;
-    } else if (getInitSound(msg) == getInitSound(wordquiz[room][1]) && wordquiz[room][1] != "") {
-        if (msg == wordquiz[room][1]) {
-            wordquiz[room][1] = "load";
+    } else if (getInitSound(msg) == wordquiz[room]["chosung"] && wordquiz[room]["word"] != "") {
+        if (msg == wordquiz[room]["word"]) {
+            wordquiz[room]["word"] = "load";
 
             reply = addEmoji(wordquizMessages["answer"]);
             reply += "\n정답: " + msg + "\n";
-            reply += sender + " 님께서 " + String(wordquiz[room][0]) + "점을 얻었습니다!!\n" + randomPicker(emojiList)
+            reply += sender + " 님께서 " + String(wordquiz[room]["score"]) + "점을 얻었습니다!!\n" + randomPicker(emojiList)
             replier.reply(room, reply);
 
-            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore.php?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Action=" + String(wordquiz[room][0]) + "&hash=" + getHash());
-            wordquiz[room] = [0, "", "", wordquiz[room][3]];
+            Utils.getTextFromWeb("https://fumire.moe/bots/wordscore?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&Action=" + String(wordquiz[room]["score"]) + "&hash=" + getHash());
+            wordquiz[room] = {"score": 0, "word": "", "chosung": "", "meaning": "", "level": wordquiz[room]["level"]};
         } else {
             var same = 0.0;
             for (var i = 0; i < msg.length; i++) {
-                if (getMiddleSound(msg.charAt(i)) == getMiddleSound(wordquiz[room][1].charAt(i))) {
+                if (getMiddleSound(msg.charAt(i)) == getMiddleSound(wordquiz[room]["word"].charAt(i))) {
                     same += 1;
                 }
-                if (getFinalSound(msg.charAt(i)) == getFinalSound(wordquiz[room][1].charAt(i))) {
+                if (getFinalSound(msg.charAt(i)) == getFinalSound(wordquiz[room]["word"].charAt(i))) {
                     same += 1;
                 }
             }
             same *= 100 / 2 / msg.length;
             if (getFinalSound(msg.charAt(msg.length - 1)) == "") {
-                replier.reply(room, "[ " + sender + " ] 님, [" + msg + "]는 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % (초성 제외) 입니다.\n→ 뜻: " + wordquiz[room][2] + "\n→ 초성: " + getInitSound(wordquiz[room][1]));
+                replier.reply(room, "[ " + sender + " ] 님, [" + msg + "]는 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % (초성 제외) 입니다.\n→ 뜻: " + wordquiz[room]["meaning"] + "\n→ 초성: " + wordquiz[room]["chosung"]);
             } else {
-                replier.reply(room, "[ " + sender + " ] 님, [" + msg + "]은 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % (초성 제외) 입니다.\n→ 뜻: " + wordquiz[room][2] + "\n→ 초성: " + getInitSound(wordquiz[room][1]));
+                replier.reply(room, "[ " + sender + " ] 님, [" + msg + "]은 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % (초성 제외) 입니다.\n→ 뜻: " + wordquiz[room]["meaning"] + "\n→ 초성: " + wordquiz[room]["chosung"]);
             }
 
             if (getProbability(99)) {
-                wordquiz[room][0] += 1;
-                replier.reply(room, "얻을 수 있는 점수가 +1점 올라 " + String(wordquiz[room][0]) + " 점이 되었습니다.");
+                wordquiz[room]["score"] += 1;
+                replier.reply(room, "얻을 수 있는 점수가 +1점 올라 " + String(wordquiz[room]["score"]) + " 점이 되었습니다.");
             } else {
-                wordquiz[room][0] += 100;
+                wordquiz[room]["score"] += 100;
                 replier.reply(room, addEmoji(wordquizMessages["jackpot"]));
-                replier.reply(room, "얻을 수 있는 점수가 +100점 올라 " + String(wordquiz[room][0]) + " 점이 되었습니다.");
+                replier.reply(room, "얻을 수 있는 점수가 +100점 올라 " + String(wordquiz[room]["score"]) + " 점이 되었습니다.");
             }
         }
         return;
     } else if (msg == "//초성 점수") {
-        replier.reply(Utils.getTextFromWeb("https://fumire.moe/bots/wordscore2.php?Room=" + encodeURIComponent(room) + "&hash=" + getHash()));
+        var data = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/wordscore2?Room=" + encodeURIComponent(room) + "&hash=" + getHash()));
+        var reply = "";
+        for (var key in data) {
+            reply += String(parseInt(key) + 1) + "위! " + data[key]["Sender"] + " (" + data[key]["Score"] + "점)\n";
+        }
+
+        replier.reply(room, reply);
         return;
     }
 
