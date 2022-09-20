@@ -145,14 +145,9 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     msg = msg.trim();
     sender = sender.trim();
     room = room.trim();
-    profile = md5(imageDB.getProfileImage());
+    profile = java.lang.String(imageDB.getProfileImage()).hashCode();
 
-    if (isGroupChat == true)
-    {
-        return;
-    }
-
-    if (isGroupChat == false && false) {
+    if (isGroupChat == false) {
         replier.reply(helpMessages["introduce"]);
         return;
     }
@@ -211,7 +206,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     }
 
     if (wordquiz[room] == undefined) {
-        wordquiz[room] = {"score": 0, "word": "", "chosung": "", "meaning": "", "level": "basic"};
+        wordquiz[room] = {
+            "score": 0,
+            "word": "",
+            "chosung": "",
+            "meaning": "",
+            "level": "basic"
+        };
     } else if (msg == "//초성 힌트" || msg == "//ㅊㅅ ㅎㅌ") {
         if (wordquiz[room]["word"] == "") {
             replier.reply(room, wordquizMessages["empty"]);
@@ -240,7 +241,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             return;
         } else if (wordquiz[room]["word"] != "") {
             replier.reply(room, wordquizMessages["already"]);
-            replier.reply("< " + getInitSound(wordquiz[room][1]) + " >\n→ 뜻: " + wordquiz[room][2]);
+            replier.reply("< " + getInitSound(wordquiz[room]["word"]) + " >\n→ 뜻: " + wordquiz[room]["meaning"]);
             return;
         }
 
@@ -285,7 +286,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         var bomb = String(getRandomInt(5, 100));
         replier.reply(room, "초성 퀴즈를 포기했습니다.\n정답은 '" + wordquiz[room]["word"] + "' 이었습니다!" + "\n[ " + sender + " ] 님의 점수가 " + bomb + "점 감점 되었습니다.");
         Utils.getTextFromWeb("https://fumire.moe/bots/wordscore?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&Action=-" + bomb + "&hash=" + getHash());
-        wordquiz[room] = ["", "", "", wordquiz[room][3]];
+        wordquiz[room] = {
+            "score": 0,
+            "word": "",
+            "chosung": "",
+            "meaning": "",
+            "level": "basic"
+        };
         return;
     } else if (getInitSound(msg) == wordquiz[room]["chosung"] && wordquiz[room]["word"] != "") {
         if (msg == wordquiz[room]["word"]) {
@@ -297,7 +304,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply(room, reply);
 
             Utils.getTextFromWeb("https://fumire.moe/bots/wordscore?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&Action=" + String(wordquiz[room]["score"]) + "&hash=" + getHash());
-            wordquiz[room] = {"score": 0, "word": "", "chosung": "", "meaning": "", "level": wordquiz[room]["level"]};
+            wordquiz[room] = {
+                "score": 0,
+                "word": "",
+                "chosung": "",
+                "meaning": "",
+                "level": wordquiz[room]["level"]
+            };
         } else {
             var same = 0.0;
             for (var i = 0; i < msg.length; i++) {
@@ -315,9 +328,10 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
                 replier.reply(room, "[ " + sender + " ] 님, [" + msg + "]은 정답이 아니에요.\n일치도는 " + same.toFixed(3) + " % (초성 제외) 입니다.\n→ 뜻: " + wordquiz[room]["meaning"] + "\n→ 초성: " + wordquiz[room]["chosung"]);
             }
 
-            if (getProbability(99)) {
-                wordquiz[room]["score"] += 1;
-                replier.reply(room, "얻을 수 있는 점수가 +1점 올라 " + String(wordquiz[room]["score"]) + " 점이 되었습니다.");
+            if (getProbability(95)) {
+                var score = getRandomInt(1, 10);
+                wordquiz[room]["score"] += score;
+                replier.reply(room, "얻을 수 있는 점수가 +" + String(score) + "점 올라 " + String(wordquiz[room]["score"]) + " 점이 되었습니다.");
             } else {
                 wordquiz[room]["score"] += 100;
                 replier.reply(room, addEmoji(wordquizMessages["jackpot"]));
@@ -329,15 +343,19 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         var data = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/wordscore2?Room=" + encodeURIComponent(room) + "&hash=" + getHash()));
         var reply = "";
         for (var key in data) {
-            reply += String(parseInt(key) + 1) + "위! " + data[key]["Sender"] + " (" + data[key]["Score"] + "점)\n";
+            reply += String(parseInt(key) + 1) + "위! " + Array(data[key]["Sender"]).join("\u200B") + " (" + data[key]["Score"] + "점)\n";
         }
-
         replier.reply(room, reply);
+
+        var data = JSON.parse(Utils.getTextFromWeb("https://fumire.moe/bots/wordscore3?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&SenderProfile=" + encodeURIComponent(profile) + "&hash=" + getHash()));
+        if (data.length > 0) {
+            replier.reply(addEmoji("\n" + data[0]["Sender"] + " 님께서는 " + data[0]["Score"] + "점 입니다!!\n\n"));
+        }
         return;
     }
 
     if (msg == "//shutup") {
-        probability[room] = 100;
+        probability[room] = 0;
         replier.reply(room, speakMessages["shutup"]);
     } else if (msg == "//speak") {
         if (probability[room] <= 95) {
