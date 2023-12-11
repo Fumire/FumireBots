@@ -354,6 +354,13 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     }
 
+    if (["후미레", "09(PVD엔지니어)", "엔초비"].includes(sender)) {
+        if (msg.includes("http://") || msg.includes("https://")) {
+            replier.reply(room, "↑ 후방주의!!");
+            return;
+        }
+    }
+
     if (msg == "//shutup") {
         probability[room] = 0;
         replier.reply(room, speakMessages["shutup"]);
@@ -399,6 +406,20 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     if (/마법의(|\s)소라고(동|둥)님(\S|\s)+(요|죠)\?/.test(msg) == true) {
         replier.reply(room, randomPicker(["응", "아니", "언젠가는", "가만히 있어", "다 안 돼", "좋아", "다시 한 번 물어봐", "안 돼"]));
         return;
+    }
+
+    if (/아니(요|오)/.test(msg) == true) {
+        if (getProbability(50)) {
+            replier.reply(room, randomPicker(["그래요", "맞는데요?", "네?!", "네니오."]));
+            return
+        }
+    }
+
+    if (/(캡|cap|Cap|cab|Cab)인/.test(msg) == true) {
+        if (getProbability(50)) {
+            replier.reply(room, randomPicker(["캡신인데요", "캡.신.", "캡'신'"]));
+            return
+        }
     }
 }
 
