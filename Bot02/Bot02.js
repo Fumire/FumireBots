@@ -417,7 +417,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 
     if (/(캡|cap|Cap|cab|Cab)인/.test(msg) == true) {
         if (getProbability(50)) {
-            replier.reply(room, randomPicker(["캡신인데요", "캡.신.", "캡'신'"]));
+            replier.reply(room, randomPicker(["캡산인데요", "캡.산.", "캡'산'"]));
             return
         }
     }
