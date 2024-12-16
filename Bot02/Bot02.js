@@ -382,33 +382,39 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         return;
     }
 
-    if (/[ㅋ]+$/.test(msg) == true && !msg.endsWith("ㅇㅋ") && !msg.endsWith("ㄹㅇㅋㅋ")) {
+    if (/^[ㅋ]+$/.test(msg) == true) {
         if (getProbability(probability[room])) {
             replier.reply(room, "ㅋ".repeat(getRandomInt(1, 10)));
             return;
         }
     }
 
-    if (/[ㅎ]+$/.test(msg) == true && !msg.endsWith("ㅇㅎ")) {
+    if (/^[ㅎ]+$/.test(msg) == true) {
         if (getProbability(probability[room])) {
             replier.reply(room, "ㅎ".repeat(getRandomInt(1, 10)));
             return;
         }
     }
 
-    if (/[ㅠㅜ]+$/.test(msg) == true) {
+    if (/^[ㅠㅜ]+$/.test(msg) == true) {
         if (getProbability(probability[room])) {
             replier.reply(room, "ㅠ".repeat(getRandomInt(1, 10)));
             return;
         }
     }
 
-    if (/마법의(|\s)소라고(동|둥)님(\S|\s)+(요|죠)\?/.test(msg) == true) {
+    if (/^봇,/.test(msg) == true) {
+        var reply = Utils.getTextFromWeb("https://fumire.moe/bots/chat1?Room=" + encodeURIComponent(room) + "&Sender=" + encodeURIComponent(sender) + "&Message=" + encodeURIComponent(msg.slice(2)) + "&hash=" + getHash());
+        replier.reply(room, sender + " 님, " + reply);
+        return
+    }
+
+    if (/^마법의(|\s)소라고(동|둥)님(\S|\s)+(요|죠)\?$/.test(msg) == true) {
         replier.reply(room, randomPicker(["응", "아니", "언젠가는", "가만히 있어", "다 안 돼", "좋아", "다시 한 번 물어봐", "안 돼"]));
         return;
     }
 
-    if (/아니(요|오)/.test(msg) == true) {
+    if (/^아니(요|오)$/.test(msg) == true) {
         if (getProbability(50)) {
             replier.reply(room, randomPicker(["그래요", "맞는데요?", "네?!", "네니오."]));
             return
